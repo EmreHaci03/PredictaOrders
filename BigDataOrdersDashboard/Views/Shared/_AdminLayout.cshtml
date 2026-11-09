@@ -1,0 +1,24 @@
+﻿<!doctype html>
+<html class="no-js " lang="en">
+@await Component.InvokeAsync("AdminLayoutHead")
+<body class="theme-orange">
+    <!-- Page Loader -->
+    @await Component.InvokeAsync("AdminLayoutPageLoader")
+
+    <!-- Overlay For Sidebars -->
+    @await Component.InvokeAsync("AdminLayoutSearchBar")
+
+    <!-- Top Bar -->
+    @await Component.InvokeAsync("AdminLayoutNavBar")
+
+    <!-- Left Sidebar -->
+    @await Component.InvokeAsync("AdminLayoutSideBar")
+
+    <!-- Right Sidebar -->
+    @await Component.InvokeAsync("AdminLayoutRightSideBar")
+
+    @RenderBody()
+
+    @await Component.InvokeAsync("AdminLayoutScript")
+</body>
+</html>

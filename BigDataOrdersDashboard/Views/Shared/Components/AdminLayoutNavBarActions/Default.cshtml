@@ -1,0 +1,8 @@
+﻿<ul class="nav navbar-nav navbar-right">
+    <li><a href="javascript:void(0);" class="js-search" data-close="true"><i class="zmdi zmdi-search"></i></a></li>
+    @await Component.InvokeAsync("AdminLayoutNavBarNotifications") 
+    @await Component.InvokeAsync("AdminLayoutNavBarTasks")
+
+    <li><a href="sign-in.html" class="mega-menu xs-hide" data-close="true" title="Çıkış Yap"><i class="zmdi zmdi-power"></i></a></li>
+    <li class=""><a href="javascript:void(0);" class="js-right-sidebar" data-close="true" title="Ayarlar"><i class="zmdi zmdi-settings zmdi-hc-spin"></i></a></li>
+</ul>
