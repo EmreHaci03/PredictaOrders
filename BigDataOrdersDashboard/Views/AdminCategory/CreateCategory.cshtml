@@ -1,0 +1,220 @@
+﻿@model Category
+@{
+    ViewData["Title"] = "Yeni Kategori";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .form-page {
+        max-width: 640px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8a8f98;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+        .back-link:hover {
+            color: #f96332;
+            text-decoration: none;
+        }
+
+    .form-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+    }
+
+    .form-card-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 26px 30px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff;
+    }
+
+    .head-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        background: rgba(255, 255, 255, .2);
+    }
+
+    .form-card-head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .form-card-head p {
+        margin: 2px 0 0;
+        opacity: .85;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    .field-label {
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+        .input-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3a8b1;
+            font-size: 18px;
+        }
+
+        .input-icon input {
+            width: 100%;
+            border: 1.5px solid #e6e8ee;
+            border-radius: 12px;
+            padding: 13px 16px 13px 46px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+            .input-icon input:focus {
+                border-color: #f96332;
+                box-shadow: 0 0 0 4px rgba(249, 99, 50, .12);
+            }
+
+    .field-hint {
+        font-size: 12px;
+        color: #a3a8b1;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .preview {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 24px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: #fff8f5;
+        border: 1px dashed #ffc9b5;
+    }
+
+    .preview-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #f96332, #ffb199);
+    }
+
+    .preview small {
+        color: #a3a8b1;
+        display: block;
+    }
+
+    .preview strong {
+        color: #2d2d2d;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 28px;
+    }
+
+    .btn-save {
+        flex: 1;
+        padding: 13px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(249, 99, 50, .3);
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        padding: 13px 24px;
+        border-radius: 12px;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+        .btn-cancel:hover {
+            text-decoration: none;
+            color: #2d2d2d;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="form-page">
+
+        <a href="/AdminCategory/Index" class="back-link"><i class="zmdi zmdi-arrow-left"></i> Kategorilere dön</a>
+
+        <div class="form-card">
+            <div class="form-card-head">
+                <div class="head-icon"><i class="zmdi zmdi-plus"></i></div>
+                <div>
+                    <h3>Yeni Kategori</h3>
+                    <p>Sisteme yeni bir ürün kategorisi ekle</p>
+                </div>
+            </div>
+
+            <div class="form-card-body">
+                <form method="post">
+                    <label asp-for="CategoryName" class="field-label">Kategori Adı</label>
+                    <div class="input-icon">
+                        <i class="zmdi zmdi-label"></i>
+                        <input asp-for="CategoryName" id="categoryName" placeholder="Örn: Elektronik" oninput="updatePreview()" />
+                    </div>
+                    <span class="field-hint">Kısa ve anlaşılır bir isim seç</span>
+                    <span asp-validation-for="CategoryName" class="text-danger"></span>
+
+                    <div class="preview">
+                        <div class="preview-avatar" id="previewAvatar">?</div>
+                        <div>
+                            <small>Önizleme</small>
+                            <strong id="previewName">Kategori adı</strong>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save"><i class="zmdi zmdi-check"></i> Kategoriyi Kaydet</button>
+                        <a href="/AdminCategory/Index" class="btn-cancel">Vazgeç</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePreview() {
+        var name = document.getElementById("categoryName").value.trim();
+        document.getElementById("previewName").innerText = name || "Kategori adı";
+        document.getElementById("previewAvatar").innerText = name ? name.charAt(0).toUpperCase() : "?";
+    }
+</script>

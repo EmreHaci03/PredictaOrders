@@ -1,0 +1,198 @@
+﻿@model Category
+@{
+    ViewData["Title"] = "Kategori Güncelle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .form-page {
+        max-width: 640px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8a8f98;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+        .back-link:hover {
+            color: #f96332;
+            text-decoration: none;
+        }
+
+    .form-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+    }
+
+    .form-card-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 26px 30px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: #fff;
+    }
+
+    .head-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        background: rgba(255, 255, 255, .2);
+    }
+
+    .form-card-head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .form-card-head p {
+        margin: 2px 0 0;
+        opacity: .9;
+    }
+
+    .id-pill {
+        margin-left: auto;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .22);
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    .field-label {
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+        .input-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3a8b1;
+            font-size: 18px;
+        }
+
+        .input-icon input {
+            width: 100%;
+            border: 1.5px solid #e6e8ee;
+            border-radius: 12px;
+            padding: 13px 16px 13px 46px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+            .input-icon input:focus {
+                border-color: #f59e0b;
+                box-shadow: 0 0 0 4px rgba(245, 158, 11, .14);
+            }
+
+    .old-value {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #fafbfc;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+        .old-value strong {
+            color: #2d2d2d;
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 28px;
+    }
+
+    .btn-save {
+        flex: 1;
+        padding: 13px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(245, 158, 11, .3);
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        padding: 13px 24px;
+        border-radius: 12px;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+        .btn-cancel:hover {
+            text-decoration: none;
+            color: #2d2d2d;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="form-page">
+
+        <a href="/AdminCategory/Index" class="back-link"><i class="zmdi zmdi-arrow-left"></i> Kategorilere dön</a>
+
+        <div class="form-card">
+            <div class="form-card-head">
+                <div class="head-icon"><i class="zmdi zmdi-edit"></i></div>
+                <div>
+                    <h3>Kategori Güncelle</h3>
+                    <p>Kategori bilgilerini düzenle</p>
+                </div>
+                <span class="id-pill">#@Model.CategoryId</span>
+            </div>
+
+            <div class="form-card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="CategoryId" />
+
+                    <label asp-for="CategoryName" class="field-label">Kategori Adı</label>
+                    <div class="input-icon">
+                        <i class="zmdi zmdi-label"></i>
+                        <input asp-for="CategoryName" />
+                    </div>
+                    <span asp-validation-for="CategoryName" class="text-danger"></span>
+
+                    <div class="old-value">
+                        <i class="zmdi zmdi-time-restore"></i>
+                        Mevcut ad: <strong>@Model.CategoryName</strong>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save"><i class="zmdi zmdi-check"></i> Değişiklikleri Kaydet</button>
+                        <a href="/AdminCategory/Index" class="btn-cancel">Vazgeç</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

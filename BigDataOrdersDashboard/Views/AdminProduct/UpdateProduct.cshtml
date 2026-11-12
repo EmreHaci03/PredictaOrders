@@ -1,0 +1,415 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "Ürün Güncelle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8a8f98;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+        .back-link:hover {
+            color: #f59e0b;
+            text-decoration: none;
+        }
+
+    .form-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .form-card-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 26px 30px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: #fff;
+    }
+
+    .head-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        background: rgba(255, 255, 255, .2);
+    }
+
+    .form-card-head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .form-card-head p {
+        margin: 2px 0 0;
+        opacity: .9;
+    }
+
+    .id-pill {
+        margin-left: auto;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .22);
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    .section-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        margin: 6px 0 14px;
+    }
+
+    .field {
+        margin-bottom: 18px;
+    }
+
+    .field-label {
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+        .input-icon > i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3a8b1;
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .input-icon input,
+        .input-icon select {
+            width: 100%;
+            height: 48px;
+            border: 1.5px solid #e6e8ee;
+            border-radius: 12px;
+            padding: 0 16px 0 46px;
+            font-size: 15px;
+            outline: none;
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+    .field textarea {
+        width: 100%;
+        border: 1.5px solid #e6e8ee;
+        border-radius: 12px;
+        padding: 13px 16px;
+        font-size: 15px;
+        outline: none;
+        resize: vertical;
+        min-height: 110px;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+        .input-icon input:focus,
+        .input-icon select:focus,
+        .field textarea:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, .14);
+        }
+
+    .field-hint {
+        font-size: 12px;
+        color: #a3a8b1;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-save {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(245, 158, 11, .3);
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        padding: 14px 24px;
+        border-radius: 12px;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+        .btn-cancel:hover {
+            text-decoration: none;
+            color: #2d2d2d;
+        }
+
+    .preview-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+
+    .preview-label {
+        padding: 16px 22px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+    .preview-image {
+        height: 200px;
+        background: linear-gradient(135deg, #f59e0b, #fcd34d);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 64px;
+        font-weight: 800;
+        overflow: hidden;
+    }
+
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .preview-body {
+        padding: 22px;
+    }
+
+    .preview-country {
+        font-size: 12px;
+        color: #a3a8b1;
+        font-weight: 600;
+    }
+
+    .preview-name {
+        font-size: 20px;
+        font-weight: 800;
+        color: #2d2d2d;
+        margin: 4px 0 8px;
+    }
+
+    .preview-desc {
+        color: #8a8f98;
+        font-size: 14px;
+        min-height: 40px;
+    }
+
+    .preview-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid #f0f1f4;
+    }
+
+    .preview-price {
+        font-size: 22px;
+        font-weight: 800;
+        color: #d97706;
+    }
+
+    .preview-stock {
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <a href="/AdminProduct/Index" class="back-link"><i class="zmdi zmdi-arrow-left"></i> Ürünlere dön</a>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="form-card-head">
+                    <div class="head-icon"><i class="zmdi zmdi-edit"></i></div>
+                    <div>
+                        <h3>Ürün Güncelle</h3>
+                        <p>@Model.ProductName ürününü düzenliyorsun</p>
+                    </div>
+                    <span class="id-pill">#@Model.ProductId</span>
+                </div>
+
+                <div class="form-card-body">
+                    <form method="post">
+                        <input type="hidden" asp-for="ProductId" />
+
+                        <div class="section-title">Temel Bilgiler</div>
+
+                        <div class="field">
+                            <label asp-for="ProductName" class="field-label">Ürün Adı</label>
+                            <div class="input-icon">
+                                <i class="zmdi zmdi-shopping-basket"></i>
+                                <input asp-for="ProductName" id="pName" oninput="updatePreview()" />
+                            </div>
+                            <span asp-validation-for="ProductName" class="text-danger"></span>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="ProductDescription" class="field-label">Açıklama</label>
+                            <textarea asp-for="ProductDescription" id="pDesc" oninput="updatePreview()"></textarea>
+                            <span asp-validation-for="ProductDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="CategoryId" class="field-label">Kategori</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-label"></i>
+                                        <select asp-for="CategoryId" asp-items="ViewBag.Categories">
+                                            <option value="">Kategori seç</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="CountryOfOrigin" class="field-label">Menşei</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-pin"></i>
+                                        <input asp-for="CountryOfOrigin" id="pCountry" oninput="updatePreview()" />
+                                    </div>
+                                    <span asp-validation-for="CountryOfOrigin" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-title">Fiyat &amp; Stok</div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="UnitPrice" class="field-label">Birim Fiyat (₺)</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-money"></i>
+                                        <input asp-for="UnitPrice" id="pPrice" type="number" step="0.01" min="0" oninput="updatePreview()" />
+                                    </div>
+                                    <span class="field-hint">Mevcut fiyat: ₺@Model.UnitPrice.ToString("N2")</span>
+                                    <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="StockQuantity" class="field-label">Stok Adedi</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-layers"></i>
+                                        <input asp-for="StockQuantity" id="pStock" type="number" min="0" oninput="updatePreview()" />
+                                    </div>
+                                    <span class="field-hint">Mevcut stok: @Model.StockQuantity adet</span>
+                                    <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-title">Görsel</div>
+
+                        <div class="field">
+                            <label asp-for="ProductImageUrl" class="field-label">Görsel URL</label>
+                            <div class="input-icon">
+                                <i class="zmdi zmdi-image"></i>
+                                <input asp-for="ProductImageUrl" id="pImage" oninput="updatePreview()" />
+                            </div>
+                            <span class="field-hint">Geçerli bir görsel adresi girersen önizlemede görünür</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save"><i class="zmdi zmdi-check"></i> Değişiklikleri Kaydet</button>
+                            <a href="/AdminProduct/Index" class="btn-cancel">Vazgeç</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="preview-card">
+                <div class="preview-label"><i class="zmdi zmdi-eye"></i> Canlı Önizleme</div>
+                <div class="preview-image" id="prevImage">?</div>
+                <div class="preview-body">
+                    <div class="preview-country" id="prevCountry">Menşei</div>
+                    <div class="preview-name" id="prevName">Ürün adı</div>
+                    <div class="preview-desc" id="prevDesc">Ürün açıklaması burada görünecek.</div>
+                    <div class="preview-footer">
+                        <span class="preview-price" id="prevPrice">₺0,00</span>
+                        <span class="preview-stock" id="prevStock">0 adet</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePreview() {
+        var name = document.getElementById("pName").value.trim();
+        var desc = document.getElementById("pDesc").value.trim();
+        var country = document.getElementById("pCountry").value.trim();
+        var price = parseFloat(document.getElementById("pPrice").value) || 0;
+        var stock = parseInt(document.getElementById("pStock").value) || 0;
+        var image = document.getElementById("pImage").value.trim();
+
+        document.getElementById("prevName").innerText = name || "Ürün adı";
+        document.getElementById("prevDesc").innerText = desc || "Ürün açıklaması burada görünecek.";
+        document.getElementById("prevCountry").innerText = country || "Menşei";
+        document.getElementById("prevPrice").innerText = "₺" + price.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        var stockEl = document.getElementById("prevStock");
+        stockEl.innerText = stock === 0 ? "Tükendi" : stock + " adet";
+        stockEl.style.background = stock === 0 ? "rgba(225,29,72,.12)" : stock < 50 ? "rgba(245,158,11,.14)" : "rgba(16,185,129,.12)";
+        stockEl.style.color = stock === 0 ? "#e11d48" : stock < 50 ? "#d97706" : "#059669";
+
+        var imageBox = document.getElementById("prevImage");
+        var letter = name ? name.charAt(0).toUpperCase() : "?";
+        if (image.startsWith("http")) {
+            imageBox.innerHTML = '<img src="' + image + '" onerror="this.parentNode.innerText=\'' + letter + '\'" />';
+        } else {
+            imageBox.innerText = letter;
+        }
+    }
+
+    updatePreview();
+</script>

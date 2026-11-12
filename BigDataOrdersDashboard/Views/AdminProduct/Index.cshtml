@@ -1,0 +1,565 @@
+﻿@model List<Product>
+@{
+    ViewData["Title"] = "Ürünler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalCount = ViewBag.TotalCount ?? 0;
+    int totalStock = ViewBag.TotalStock ?? 0;
+    decimal averagePrice = ViewBag.AveragePrice ?? 0m;
+    int criticalStock = ViewBag.CriticalStock ?? 0;
+
+    int startPage = Math.Max(1, currentPage - 2);
+    int endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+<style>
+    .page-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .page-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .page-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff !important;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(249, 99, 50, .3);
+        transition: transform .2s;
+    }
+
+        .btn-hero:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+    .stat-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        margin-bottom: 24px;
+    }
+
+    .stat-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+    }
+
+        .stat-icon.orange {
+            background: rgba(249, 99, 50, .12);
+            color: #f96332;
+        }
+
+        .stat-icon.green {
+            background: rgba(16, 185, 129, .12);
+            color: #059669;
+        }
+
+        .stat-icon.blue {
+            background: rgba(59, 130, 246, .12);
+            color: #2563eb;
+        }
+
+        .stat-icon.red {
+            background: rgba(225, 29, 72, .12);
+            color: #e11d48;
+        }
+
+    .stat-box h3 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+    }
+
+    .stat-box span {
+        color: #8a8f98;
+        font-size: 13px;
+    }
+
+    .list-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+    }
+
+    .list-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 20px 24px;
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+        .list-card-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3a8b1;
+        }
+
+        .search-box input {
+            border: 1px solid #e6e8ee;
+            border-radius: 10px;
+            padding: 9px 14px 9px 38px;
+            width: 260px;
+            outline: none;
+        }
+
+            .search-box input:focus {
+                border-color: #f96332;
+            }
+
+    .p-table {
+        width: 100%;
+        margin: 0;
+    }
+
+        .p-table thead th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 14px 20px;
+            border: none;
+            background: #fafbfc;
+            white-space: nowrap;
+        }
+
+        .p-table tbody td {
+            padding: 14px 20px;
+            vertical-align: middle;
+            border-top: 1px solid #f3f4f7;
+        }
+
+        .p-table tbody tr:hover {
+            background: #fff8f5;
+        }
+
+    .product-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 260px;
+    }
+
+    .product-img {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, #f96332, #ffb199);
+        color: #fff;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+    }
+
+    .product-name {
+        font-weight: 700;
+        color: #2d2d2d;
+        display: block;
+    }
+
+    .product-desc {
+        font-size: 12px;
+        color: #a3a8b1;
+        display: block;
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .soft-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .soft-badge.gray {
+            background: #f3f4f7;
+            color: #6b7280;
+        }
+
+        .soft-badge.green {
+            background: rgba(16, 185, 129, .12);
+            color: #059669;
+        }
+
+        .soft-badge.amber {
+            background: rgba(245, 158, 11, .14);
+            color: #d97706;
+        }
+
+        .soft-badge.red {
+            background: rgba(225, 29, 72, .12);
+            color: #e11d48;
+        }
+
+    .price {
+        font-weight: 800;
+        color: #2d2d2d;
+        white-space: nowrap;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-grid;
+        place-items: center;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform .15s;
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .action-btn.edit {
+            background: rgba(245, 158, 11, .14);
+            color: #d97706;
+        }
+
+        .action-btn.delete {
+            background: rgba(225, 29, 72, .12);
+            color: #e11d48;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #a3a8b1;
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+    .pager {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 24px;
+        border-top: 1px solid #f0f1f4;
+    }
+
+    .pager-info {
+        color: #8a8f98;
+        font-size: 13px;
+    }
+
+    .pager-buttons {
+        display: flex;
+        gap: 6px;
+    }
+
+    .pager-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 10px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-weight: 600;
+        transition: background .15s;
+    }
+
+        .pager-btn:hover {
+            background: #ffe9e0;
+            color: #f96332;
+            text-decoration: none;
+        }
+
+        .pager-btn.active {
+            background: linear-gradient(135deg, #f96332, #ff8a5c);
+            color: #fff;
+        }
+
+        .pager-btn.disabled {
+            pointer-events: none;
+            opacity: .4;
+        }
+
+    .delete-modal .modal-content {
+        border: none;
+        border-radius: 18px;
+    }
+
+    .delete-modal .modal-body {
+        text-align: center;
+        padding: 36px 30px 20px;
+    }
+
+    .delete-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        margin: 0 auto 18px;
+        display: grid;
+        place-items: center;
+        font-size: 36px;
+        background: rgba(225, 29, 72, .12);
+        color: #e11d48;
+    }
+
+    .delete-name {
+        display: inline-block;
+        margin: 8px 0 12px;
+        padding: 5px 16px;
+        border-radius: 999px;
+        background: #f3f4f7;
+        font-weight: 700;
+    }
+
+    .delete-modal .modal-footer {
+        border-top: none;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 30px 30px;
+    }
+
+        .delete-modal .modal-footer .btn {
+            min-width: 120px;
+            border-radius: 10px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="page-hero">
+        <div>
+            <h2>Ürünler</h2>
+            <p>Ürün kataloğunu, fiyatları ve stok durumlarını buradan yönetebilirsin</p>
+        </div>
+        <a href="/AdminProduct/CreateProduct" class="btn-hero">
+            <i class="zmdi zmdi-plus"></i> Yeni Ürün
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon orange"><i class="zmdi zmdi-shopping-basket"></i></div>
+                <div>
+                    <h3>@totalCount.ToString("N0")</h3>
+                    <span>Toplam Ürün</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon green"><i class="zmdi zmdi-layers"></i></div>
+                <div>
+                    <h3>@totalStock.ToString("N0")</h3>
+                    <span>Toplam Stok</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon blue"><i class="zmdi zmdi-money"></i></div>
+                <div>
+                    <h3>₺@averagePrice.ToString("N2")</h3>
+                    <span>Ortalama Fiyat</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon red"><i class="zmdi zmdi-alert-triangle"></i></div>
+                <div>
+                    <h3>@criticalStock</h3>
+                    <span>Kritik Stok (&lt; 50)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-card">
+        <div class="list-card-header">
+            <h4>Ürün Listesi</h4>
+            <div class="search-box">
+                <i class="zmdi zmdi-search"></i>
+                <input type="text" id="productSearch" placeholder="Bu sayfada ara..." onkeyup="filterProducts()" />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="p-table">
+                <thead>
+                    <tr>
+                        <th>Ürün</th>
+                        <th>Kategori</th>
+                        <th>Menşei</th>
+                        <th>Fiyat</th>
+                        <th>Stok</th>
+                        <th class="text-right">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="productList">
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="zmdi zmdi-shopping-basket"></i>
+                                    Henüz ürün eklenmemiş
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        var stockClass = item.StockQuantity == 0 ? "red" : item.StockQuantity < 50 ? "amber" : "green";
+                        var stockText = item.StockQuantity == 0 ? "Tükendi" : item.StockQuantity + " adet";
+
+                        <tr>
+                            <td>
+                                <div class="product-cell">
+                                    <img src="@item.ProductImageUrl" class="product-img" alt=""
+                                         onerror="this.outerHTML='<div class=&quot;product-img&quot;>@item.ProductName.Substring(0, 1).ToUpper()</div>'" />
+                                    <div>
+                                        <span class="product-name">@item.ProductName</span>
+                                        <span class="product-desc" title="@item.ProductDescription">@item.ProductDescription</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="soft-badge gray">@item.Category.CategoryName</span></td>
+                            <td><i class="zmdi zmdi-pin" style="color:#a3a8b1;"></i> @item.CountryOfOrigin</td>
+                            <td><span class="price">₺@item.UnitPrice.ToString("N2")</span></td>
+                            <td><span class="soft-badge @stockClass">@stockText</span></td>
+                            <td class="text-right" style="white-space:nowrap;">
+                                <a href="/AdminProduct/UpdateProduct/@item.ProductId" class="action-btn edit" title="Güncelle">
+                                    <i class="zmdi zmdi-edit"></i>
+                                </a>
+                                <button type="button" class="action-btn delete" title="Sil"
+                                        data-toggle="modal" data-target="#deleteModal"
+                                        data-name="@item.ProductName"
+                                        data-url="/AdminProduct/DeleteProduct/@item.ProductId"
+                                        onclick="setDeleteModal(this)">
+                                    <i class="zmdi zmdi-delete"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="pager">
+                <span class="pager-info">Sayfa @currentPage / @totalPages · Toplam @totalCount.ToString("N0") ürün</span>
+                <div class="pager-buttons">
+                    <a href="?page=1" class="pager-btn @(currentPage == 1 ? "disabled" : "")" title="İlk sayfa"><i class="zmdi zmdi-skip-previous"></i></a>
+                    <a href="?page=@(currentPage - 1)" class="pager-btn @(currentPage == 1 ? "disabled" : "")" title="Önceki"><i class="zmdi zmdi-chevron-left"></i></a>
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <a href="?page=@i" class="pager-btn @(i == currentPage ? "active" : "")">@i</a>
+                    }
+
+                    <a href="?page=@(currentPage + 1)" class="pager-btn @(currentPage == totalPages ? "disabled" : "")" title="Sonraki"><i class="zmdi zmdi-chevron-right"></i></a>
+                    <a href="?page=@totalPages" class="pager-btn @(currentPage == totalPages ? "disabled" : "")" title="Son sayfa"><i class="zmdi zmdi-skip-next"></i></a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade delete-modal" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="delete-icon"><i class="zmdi zmdi-delete"></i></div>
+                <h4 style="font-weight:700;">Ürünü Sil</h4>
+                <p class="m-b-0">Aşağıdaki ürünü silmek üzeresin:</p>
+                <span class="delete-name" id="deleteName"></span>
+                <p class="text-muted" style="font-size:13px;">
+                    <i class="zmdi zmdi-alert-triangle"></i> Bu ürüne ait siparişler varsa silme işlemi başarısız olur.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Vazgeç</button>
+                <form id="deleteForm" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDeleteModal(button) {
+        document.getElementById("deleteName").innerText = button.getAttribute("data-name");
+        document.getElementById("deleteForm").setAttribute("action", button.getAttribute("data-url"));
+    }
+
+    function filterProducts() {
+        var search = document.getElementById("productSearch").value.toLowerCase();
+        var rows = document.querySelectorAll("#productList tr");
+        rows.forEach(function (row) {
+            row.style.display = row.innerText.toLowerCase().includes(search) ? "" : "none";
+        });
+    }
+</script>

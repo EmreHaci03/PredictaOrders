@@ -1,0 +1,388 @@
+﻿@model List<BigDataOrdersDashboard.Entities.Category>
+@{
+    ViewData["Title"] = "Kategoriler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .page-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .page-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff !important;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(249, 99, 50, .3);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+        .btn-hero:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(249, 99, 50, .38);
+            text-decoration: none;
+        }
+
+    .stat-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        margin-bottom: 24px;
+    }
+
+    .stat-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+        background: rgba(249, 99, 50, .12);
+        color: #f96332;
+    }
+
+    .stat-box h3 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 800;
+        color: #2d2d2d;
+    }
+
+    .stat-box span {
+        color: #8a8f98;
+        font-size: 13px;
+    }
+
+    .list-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+    }
+
+    .list-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 20px 24px;
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+        .list-card-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3a8b1;
+        }
+
+        .search-box input {
+            border: 1px solid #e6e8ee;
+            border-radius: 10px;
+            padding: 9px 14px 9px 38px;
+            width: 240px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+            .search-box input:focus {
+                border-color: #f96332;
+            }
+
+    .cat-table {
+        width: 100%;
+        margin: 0;
+    }
+
+        .cat-table thead th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 14px 24px;
+            border: none;
+            background: #fafbfc;
+        }
+
+        .cat-table tbody td {
+            padding: 14px 24px;
+            vertical-align: middle;
+            border-top: 1px solid #f3f4f7;
+        }
+
+        .cat-table tbody tr {
+            transition: background .15s;
+        }
+
+            .cat-table tbody tr:hover {
+                background: #fff8f5;
+            }
+
+    .cat-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: inline-grid;
+        place-items: center;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #f96332, #ffb199);
+        margin-right: 12px;
+    }
+
+    .cat-name {
+        font-weight: 600;
+        color: #2d2d2d;
+    }
+
+    .id-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-grid;
+        place-items: center;
+        border: none;
+        font-size: 16px;
+        transition: transform .15s;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .action-btn.edit {
+            background: rgba(245, 158, 11, .14);
+            color: #d97706;
+        }
+
+        .action-btn.delete {
+            background: rgba(225, 29, 72, .12);
+            color: #e11d48;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #a3a8b1;
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+    .delete-modal .modal-content {
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .delete-modal .modal-body {
+        text-align: center;
+        padding: 36px 30px 20px;
+    }
+
+    .delete-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        margin: 0 auto 18px;
+        display: grid;
+        place-items: center;
+        font-size: 36px;
+        background: rgba(225, 29, 72, .12);
+        color: #e11d48;
+    }
+
+    .delete-name {
+        display: inline-block;
+        margin: 8px 0 12px;
+        padding: 5px 16px;
+        border-radius: 999px;
+        background: #f3f4f7;
+        font-weight: 700;
+    }
+
+    .delete-modal .modal-footer {
+        border-top: none;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 30px 30px;
+    }
+
+        .delete-modal .modal-footer .btn {
+            min-width: 120px;
+            border-radius: 10px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="page-hero">
+        <div>
+            <h2>Kategoriler</h2>
+            <p>Ürün kategorilerini buradan görüntüleyip yönetebilirsin</p>
+        </div>
+        <a href="/AdminCategory/CreateCategory" class="btn-hero">
+            <i class="zmdi zmdi-plus"></i> Yeni Kategori
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon"><i class="zmdi zmdi-labels"></i></div>
+                <div>
+                    <h3>@Model.Count</h3>
+                    <span>Toplam Kategori</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-card">
+        <div class="list-card-header">
+            <h4>Kategori Listesi</h4>
+            <div class="search-box">
+                <i class="zmdi zmdi-search"></i>
+                <input type="text" id="categorySearch" placeholder="Kategori ara..." onkeyup="filterCategories()" />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="cat-table">
+                <thead>
+                    <tr>
+                        <th>Kategori</th>
+                        <th>Id</th>
+                        <th class="text-right">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryList">
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3">
+                                <div class="empty-state">
+                                    <i class="zmdi zmdi-folder-outline"></i>
+                                    Henüz kategori eklenmemiş
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="cat-avatar">@item.CategoryName.Substring(0, 1).ToUpper()</span>
+                                <span class="cat-name">@item.CategoryName</span>
+                            </td>
+                            <td><span class="id-badge">#@item.CategoryId</span></td>
+                            <td class="text-right">
+                                <a href="/AdminCategory/UpdateCategory/@item.CategoryId" class="action-btn edit" title="Güncelle">
+                                    <i class="zmdi zmdi-edit"></i>
+                                </a>
+                                <button type="button" class="action-btn delete" title="Sil"
+                                        data-toggle="modal" data-target="#deleteModal"
+                                        data-name="@item.CategoryName"
+                                        data-url="/AdminCategory/DeleteCategory/@item.CategoryId"
+                                        onclick="setDeleteModal(this)">
+                                    <i class="zmdi zmdi-delete"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade delete-modal" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="delete-icon"><i class="zmdi zmdi-delete"></i></div>
+                <h4 style="font-weight:700;">Kategoriyi Sil</h4>
+                <p class="m-b-0">Aşağıdaki kategoriyi silmek üzeresin:</p>
+                <span class="delete-name" id="deleteName"></span>
+                <p class="text-muted" style="font-size:13px;">
+                    <i class="zmdi zmdi-alert-triangle"></i> Bu kategoriye bağlı ürünler varsa silme işlemi başarısız olur.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Vazgeç</button>
+                <form id="deleteForm" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDeleteModal(button) {
+        document.getElementById("deleteName").innerText = button.getAttribute("data-name");
+        document.getElementById("deleteForm").setAttribute("action", button.getAttribute("data-url"));
+    }
+
+    function filterCategories() {
+        var search = document.getElementById("categorySearch").value.toLowerCase();
+        var rows = document.querySelectorAll("#categoryList tr");
+        rows.forEach(function (row) {
+            row.style.display = row.innerText.toLowerCase().includes(search) ? "" : "none";
+        });
+    }
+</script>

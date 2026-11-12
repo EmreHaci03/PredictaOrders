@@ -17,7 +17,9 @@
     <!-- Right Sidebar -->
     @await Component.InvokeAsync("AdminLayoutRightSideBar")
 
-    @RenderBody()
+    <section class="content">
+        @RenderBody()
+    </section>
 
     @await Component.InvokeAsync("AdminLayoutScript")
 </body>

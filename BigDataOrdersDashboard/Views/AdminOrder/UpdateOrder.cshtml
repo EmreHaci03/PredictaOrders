@@ -1,0 +1,485 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Sipariş Güncelle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var paymentOptions = new List<string> { "Kredi Kartı", "Havale/EFT", "Kapıda Ödeme" };
+    var statusOptions = new List<string> { "Hazırlanıyor", "Kargoda", "Teslim Edildi", "İptal Edildi" };
+
+    if (!string.IsNullOrEmpty(Model.PaymentMethod) && !paymentOptions.Contains(Model.PaymentMethod))
+    {
+        paymentOptions.Insert(0, Model.PaymentMethod);
+    }
+    if (!string.IsNullOrEmpty(Model.OrderStatus) && !statusOptions.Contains(Model.OrderStatus))
+    {
+        statusOptions.Insert(0, Model.OrderStatus);
+    }
+
+    var unitPrice = Model.Product?.UnitPrice ?? 0;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap4.min.css" rel="stylesheet">
+
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8a8f98;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+        .back-link:hover {
+            color: #f59e0b;
+            text-decoration: none;
+        }
+
+    .form-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: visible;
+        margin-bottom: 24px;
+    }
+
+    .form-card-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 26px 30px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: #fff;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .head-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        background: rgba(255, 255, 255, .2);
+    }
+
+    .form-card-head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .form-card-head p {
+        margin: 2px 0 0;
+        opacity: .9;
+    }
+
+    .id-pill {
+        margin-left: auto;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .22);
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    .section-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        margin: 6px 0 14px;
+    }
+
+    .field {
+        margin-bottom: 18px;
+    }
+
+    .field-label {
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .field-hint {
+        font-size: 12px;
+        color: #a3a8b1;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .plain-input,
+    .plain-select {
+        width: 100%;
+        height: 48px;
+        border: 1.5px solid #e6e8ee;
+        border-radius: 12px;
+        padding: 0 16px;
+        font-size: 15px;
+        outline: none;
+        background: #fff;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    .plain-textarea {
+        width: 100%;
+        border: 1.5px solid #e6e8ee;
+        border-radius: 12px;
+        padding: 13px 16px;
+        font-size: 15px;
+        outline: none;
+        resize: vertical;
+        min-height: 90px;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+        .plain-input:focus,
+        .plain-select:focus,
+        .plain-textarea:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, .14);
+        }
+
+    .ts-wrapper .ts-control {
+        min-height: 48px;
+        border: 1.5px solid #e6e8ee !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+        font-size: 15px;
+        box-shadow: none !important;
+    }
+
+    .ts-wrapper.focus .ts-control {
+        border-color: #f59e0b !important;
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, .14) !important;
+    }
+
+    .ts-dropdown {
+        border-radius: 12px;
+        border: 1px solid #e6e8ee;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .1);
+        overflow: hidden;
+    }
+
+        .ts-dropdown .active {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+    .opt-sub {
+        display: block;
+        font-size: 12px;
+        color: #a3a8b1;
+    }
+
+    .qty-box {
+        display: flex;
+        align-items: center;
+        border: 1.5px solid #e6e8ee;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 48px;
+    }
+
+        .qty-box button {
+            width: 48px;
+            height: 100%;
+            border: none;
+            background: #f8f9fb;
+            font-size: 20px;
+            font-weight: 700;
+            color: #6b7280;
+            cursor: pointer;
+        }
+
+            .qty-box button:hover {
+                background: #fffbeb;
+                color: #d97706;
+            }
+
+        .qty-box input {
+            flex: 1;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            outline: none;
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-save {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(245, 158, 11, .3);
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        padding: 14px 24px;
+        border-radius: 12px;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+        .btn-cancel:hover {
+            text-decoration: none;
+            color: #2d2d2d;
+        }
+
+    .summary-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+
+    .summary-head {
+        padding: 18px 22px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+    .summary-body {
+        padding: 22px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+        font-size: 14px;
+    }
+
+        .summary-row span:first-child {
+            color: #8a8f98;
+        }
+
+        .summary-row span:last-child {
+            font-weight: 600;
+            color: #2d2d2d;
+            text-align: right;
+        }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 14px;
+        background: #fffbeb;
+    }
+
+        .summary-total span:first-child {
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .summary-total span:last-child {
+            font-size: 24px;
+            font-weight: 800;
+            color: #d97706;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <a href="/AdminOrder/Index" class="back-link"><i class="zmdi zmdi-arrow-left"></i> Siparişlere dön</a>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="form-card-head">
+                    <div class="head-icon"><i class="zmdi zmdi-edit"></i></div>
+                    <div>
+                        <h3>Sipariş Güncelle</h3>
+                        <p>@Model.OrderDate.ToString("dd.MM.yyyy HH:mm") tarihli siparişi düzenliyorsun</p>
+                    </div>
+                    <span class="id-pill">#@Model.OrderId</span>
+                </div>
+
+                <div class="form-card-body">
+                    <form method="post">
+                        <input type="hidden" asp-for="OrderId" />
+
+                        <div class="section-title">Müşteri &amp; Ürün</div>
+
+                        <div class="field">
+                            <label class="field-label">Müşteri</label>
+                            <select asp-for="CustomerId" id="customerSelect" placeholder="Ad, soyad veya e-posta ile ara...">
+                                <option value="@Model.CustomerId" selected>@Model.Customer?.CustomerName @Model.Customer?.CustomerSurname</option>
+                            </select>
+                            <span class="field-hint">Değiştirmek için yazarak ara</span>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Ürün</label>
+                            <select asp-for="ProductId" id="productSelect" placeholder="Ürün adıyla ara...">
+                                <option value="@Model.ProductId" selected>@Model.Product?.ProductName</option>
+                            </select>
+                            <span class="field-hint">Değiştirmek için yazarak ara</span>
+                        </div>
+
+                        <div class="section-title">Sipariş Detayı</div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="field">
+                                    <label class="field-label">Adet</label>
+                                    <div class="qty-box">
+                                        <button type="button" onclick="changeQty(-1)">−</button>
+                                        <input asp-for="Quantity" id="quantity" type="number" min="1" oninput="updateSummary()" />
+                                        <button type="button" onclick="changeQty(1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field">
+                                    <label class="field-label">Ödeme Yöntemi</label>
+                                    <select asp-for="PaymentMethod" id="paymentMethod" class="plain-select" onchange="updateSummary()">
+                                        @foreach (var p in paymentOptions)
+                                        {
+                                            <option value="@p">@p</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field">
+                                    <label class="field-label">Durum</label>
+                                    <select asp-for="OrderStatus" id="orderStatus" class="plain-select" onchange="updateSummary()">
+                                        @foreach (var s in statusOptions)
+                                        {
+                                            <option value="@s">@s</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Sipariş Tarihi</label>
+                            <input asp-for="OrderDate" class="plain-input" type="datetime-local" />
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Sipariş Notu</label>
+                            <textarea asp-for="OrderNotes" class="plain-textarea" placeholder="İsteğe bağlı not..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save"><i class="zmdi zmdi-check"></i> Değişiklikleri Kaydet</button>
+                            <a href="/AdminOrder/Index" class="btn-cancel">Vazgeç</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <div class="summary-head"><i class="zmdi zmdi-receipt"></i> Sipariş Özeti</div>
+                <div class="summary-body">
+                    <div class="summary-row"><span>Müşteri</span><span id="sumCustomer">@Model.Customer?.CustomerName @Model.Customer?.CustomerSurname</span></div>
+                    <div class="summary-row"><span>Ürün</span><span id="sumProduct">@Model.Product?.ProductName</span></div>
+                    <div class="summary-row"><span>Birim Fiyat</span><span id="sumPrice">₺0,00</span></div>
+                    <div class="summary-row"><span>Adet</span><span id="sumQty">0</span></div>
+                    <div class="summary-row"><span>Ödeme</span><span id="sumPayment">—</span></div>
+                    <div class="summary-row"><span>Durum</span><span id="sumStatus">—</span></div>
+                    <div class="summary-total"><span>Toplam</span><span id="sumTotal">₺0,00</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script>
+    var selectedPrice = @unitPrice.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    function formatPrice(value) {
+        return "₺" + Number(value).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function remoteSelect(selector, url, onSelect) {
+        return new TomSelect(selector, {
+            valueField: "id",
+            labelField: "text",
+            searchField: "text",
+            maxOptions: 20,
+            loadThrottle: 300,
+            shouldLoad: function (query) { return query.length >= 2; },
+            load: function (query, callback) {
+                fetch(url + "?term=" + encodeURIComponent(query))
+                    .then(function (res) { return res.json(); })
+                    .then(callback)
+                    .catch(function () { callback(); });
+            },
+            render: {
+                option: function (item, escape) {
+                    var sub = item.sub ? escape(item.sub) : (item.price !== undefined ? formatPrice(item.price) : "");
+                    return '<div>' + escape(item.text) + '<span class="opt-sub">' + sub + '</span></div>';
+                },
+                no_results: function () { return '<div class="no-results" style="padding:10px 14px;">Sonuç bulunamadı</div>'; }
+            },
+            onChange: function (value) {
+                onSelect(value ? this.options[value] : null);
+            }
+        });
+    }
+
+    remoteSelect("#customerSelect", "/AdminOrder/SearchCustomers", function (item) {
+        document.getElementById("sumCustomer").innerText = item ? item.text : "—";
+    });
+
+    remoteSelect("#productSelect", "/AdminOrder/SearchProducts", function (item) {
+        if (item && item.price !== undefined) {
+            selectedPrice = Number(item.price);
+        }
+        document.getElementById("sumProduct").innerText = item ? item.text : "—";
+        updateSummary();
+    });
+
+    function changeQty(step) {
+        var input = document.getElementById("quantity");
+        var value = (parseInt(input.value) || 1) + step;
+        input.value = value < 1 ? 1 : value;
+        updateSummary();
+    }
+
+    function updateSummary() {
+        var qty = parseInt(document.getElementById("quantity").value) || 0;
+        document.getElementById("sumQty").innerText = qty;
+        document.getElementById("sumPrice").innerText = formatPrice(selectedPrice);
+        document.getElementById("sumPayment").innerText = document.getElementById("paymentMethod").value;
+        document.getElementById("sumStatus").innerText = document.getElementById("orderStatus").value;
+        document.getElementById("sumTotal").innerText = formatPrice(selectedPrice * qty);
+    }
+
+    updateSummary();
+</script>

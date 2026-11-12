@@ -1,0 +1,634 @@
+﻿@model List<Order>
+@{
+    ViewData["Title"] = "Siparişler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalCount = ViewBag.TotalCount ?? 0;
+
+    int startPage = Math.Max(1, currentPage - 2);
+    int endPage = Math.Min(totalPages, currentPage + 2);
+
+    decimal pageRevenue = Model.Sum(x => x.Quantity * (x.Product?.UnitPrice ?? 0));
+    int pageQuantity = Model.Sum(x => x.Quantity);
+}
+
+<style>
+    .page-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .page-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .page-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff !important;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(249, 99, 50, .3);
+        transition: transform .2s;
+    }
+
+        .btn-hero:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+    .stat-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        margin-bottom: 24px;
+    }
+
+    .stat-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+    }
+
+        .stat-icon.orange {
+            background: rgba(249, 99, 50, .12);
+            color: #f96332;
+        }
+
+        .stat-icon.green {
+            background: rgba(16, 185, 129, .12);
+            color: #059669;
+        }
+
+        .stat-icon.blue {
+            background: rgba(59, 130, 246, .12);
+            color: #2563eb;
+        }
+
+    .stat-box h3 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+    }
+
+    .stat-box span {
+        color: #8a8f98;
+        font-size: 13px;
+    }
+
+    .list-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+    }
+
+    .list-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 20px 24px;
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+        .list-card-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3a8b1;
+        }
+
+        .search-box input {
+            border: 1px solid #e6e8ee;
+            border-radius: 10px;
+            padding: 9px 14px 9px 38px;
+            width: 260px;
+            outline: none;
+        }
+
+            .search-box input:focus {
+                border-color: #f96332;
+            }
+
+    .o-table {
+        width: 100%;
+        margin: 0;
+    }
+
+        .o-table thead th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 14px 18px;
+            border: none;
+            background: #fafbfc;
+            white-space: nowrap;
+        }
+
+        .o-table tbody td {
+            padding: 14px 18px;
+            vertical-align: middle;
+            border-top: 1px solid #f3f4f7;
+        }
+
+        .o-table tbody tr:hover {
+            background: #fff8f5;
+        }
+
+    .order-id {
+        font-weight: 800;
+        color: #2d2d2d;
+        white-space: nowrap;
+    }
+
+    .order-date {
+        display: block;
+        font-size: 12px;
+        color: #a3a8b1;
+        white-space: nowrap;
+    }
+
+    .person-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 180px;
+    }
+
+    .person-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, #f96332, #ffb199);
+        color: #fff;
+        font-weight: 800;
+        font-size: 13px;
+        display: grid;
+        place-items: center;
+    }
+
+    .person-name {
+        font-weight: 700;
+        color: #2d2d2d;
+        display: block;
+        white-space: nowrap;
+    }
+
+    .person-sub {
+        font-size: 12px;
+        color: #a3a8b1;
+        display: block;
+        white-space: nowrap;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #2d2d2d;
+        display: block;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .qty {
+        display: inline-grid;
+        place-items: center;
+        min-width: 34px;
+        height: 30px;
+        padding: 0 8px;
+        border-radius: 8px;
+        background: #f3f4f7;
+        font-weight: 700;
+        color: #2d2d2d;
+    }
+
+    .total {
+        font-weight: 800;
+        color: #2d2d2d;
+        white-space: nowrap;
+    }
+
+    .soft-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .soft-badge.gray {
+            background: #f3f4f7;
+            color: #6b7280;
+        }
+
+        .soft-badge.green {
+            background: rgba(16, 185, 129, .12);
+            color: #059669;
+        }
+
+        .soft-badge.amber {
+            background: rgba(245, 158, 11, .14);
+            color: #d97706;
+        }
+
+        .soft-badge.blue {
+            background: rgba(59, 130, 246, .12);
+            color: #2563eb;
+        }
+
+        .soft-badge.red {
+            background: rgba(225, 29, 72, .12);
+            color: #e11d48;
+        }
+
+        .soft-badge.purple {
+            background: rgba(124, 58, 237, .12);
+            color: #7c3aed;
+        }
+
+    .note-icon {
+        color: #a3a8b1;
+        cursor: help;
+    }
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: inline-grid;
+        place-items: center;
+        border: none;
+        font-size: 15px;
+        cursor: pointer;
+        transition: transform .15s;
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .action-btn.edit {
+            background: rgba(245, 158, 11, .14);
+            color: #d97706;
+        }
+
+        .action-btn.delete {
+            background: rgba(225, 29, 72, .12);
+            color: #e11d48;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #a3a8b1;
+    }
+
+        .empty-state i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+    .pager {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 24px;
+        border-top: 1px solid #f0f1f4;
+    }
+
+    .pager-info {
+        color: #8a8f98;
+        font-size: 13px;
+    }
+
+    .pager-buttons {
+        display: flex;
+        gap: 6px;
+    }
+
+    .pager-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 10px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-weight: 600;
+        transition: background .15s;
+    }
+
+        .pager-btn:hover {
+            background: #ffe9e0;
+            color: #f96332;
+            text-decoration: none;
+        }
+
+        .pager-btn.active {
+            background: linear-gradient(135deg, #f96332, #ff8a5c);
+            color: #fff;
+        }
+
+        .pager-btn.disabled {
+            pointer-events: none;
+            opacity: .4;
+        }
+
+    .delete-modal .modal-content {
+        border: none;
+        border-radius: 18px;
+    }
+
+    .delete-modal .modal-body {
+        text-align: center;
+        padding: 36px 30px 20px;
+    }
+
+    .delete-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        margin: 0 auto 18px;
+        display: grid;
+        place-items: center;
+        font-size: 36px;
+        background: rgba(225, 29, 72, .12);
+        color: #e11d48;
+    }
+
+    .delete-name {
+        display: inline-block;
+        margin: 8px 0 12px;
+        padding: 5px 16px;
+        border-radius: 999px;
+        background: #f3f4f7;
+        font-weight: 700;
+    }
+
+    .delete-modal .modal-footer {
+        border-top: none;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 30px 30px;
+    }
+
+        .delete-modal .modal-footer .btn {
+            min-width: 120px;
+            border-radius: 10px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="page-hero">
+        <div>
+            <h2>Siparişler</h2>
+            <p>Tüm siparişleri, müşteri ve ürün detaylarıyla buradan takip edebilirsin</p>
+        </div>
+        <a href="/AdminOrder/CreateOrder/" class="btn-hero">
+            <i class="zmdi zmdi-plus"></i> Yeni Sipariş
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon orange"><i class="zmdi zmdi-shopping-cart"></i></div>
+                <div>
+                    <h3>@totalCount.ToString("N0")</h3>
+                    <span>Toplam Sipariş</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon green"><i class="zmdi zmdi-money"></i></div>
+                <div>
+                    <h3>₺@pageRevenue.ToString("N2")</h3>
+                    <span>Bu Sayfadaki Tutar</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-box">
+                <div class="stat-icon blue"><i class="zmdi zmdi-layers"></i></div>
+                <div>
+                    <h3>@pageQuantity.ToString("N0")</h3>
+                    <span>Bu Sayfadaki Ürün Adedi</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-card">
+        <div class="list-card-header">
+            <h4>Sipariş Listesi</h4>
+            <div class="search-box">
+                <i class="zmdi zmdi-search"></i>
+                <input type="text" id="orderSearch" placeholder="Bu sayfada ara..." onkeyup="filterOrders()" />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="o-table">
+                <thead>
+                    <tr>
+                        <th>Sipariş</th>
+                        <th>Müşteri</th>
+                        <th>Ürün</th>
+                        <th class="text-center">Adet</th>
+                        <th>Tutar</th>
+                        <th>Ödeme</th>
+                        <th>Durum</th>
+                        <th class="text-right">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="orderList">
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <i class="zmdi zmdi-shopping-cart"></i>
+                                    Henüz sipariş yok
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        var customerName = $"{item.Customer?.CustomerName} {item.Customer?.CustomerSurname}".Trim();
+                        var initials = ((item.Customer?.CustomerName?.Substring(0, 1) ?? "") + (item.Customer?.CustomerSurname?.Substring(0, 1) ?? "")).ToUpper();
+                        var unitPrice = item.Product?.UnitPrice ?? 0;
+                        var total = item.Quantity * unitPrice;
+
+                        var status = item.OrderStatus ?? "";
+                        var statusLower = status.ToLower();
+                        var statusClass =
+                            statusLower.Contains("iptal") || statusLower.Contains("cancel") ? "red" :
+                            statusLower.Contains("tamam") || statusLower.Contains("teslim") || statusLower.Contains("complete") || statusLower.Contains("deliver") ? "green" :
+                            statusLower.Contains("kargo") || statusLower.Contains("ship") ? "blue" :
+                            statusLower.Contains("hazır") || statusLower.Contains("bekl") || statusLower.Contains("pending") || statusLower.Contains("process") ? "amber" :
+                            "gray";
+
+                        var paymentLower = (item.PaymentMethod ?? "").ToLower();
+                        var paymentIcon =
+                            paymentLower.Contains("kredi") || paymentLower.Contains("kart") || paymentLower.Contains("card") ? "zmdi-card" :
+                            paymentLower.Contains("havale") || paymentLower.Contains("eft") || paymentLower.Contains("transfer") ? "zmdi-balance" :
+                            paymentLower.Contains("nakit") || paymentLower.Contains("kapı") || paymentLower.Contains("cash") ? "zmdi-money" :
+                            "zmdi-wallet";
+
+                        <tr>
+                            <td>
+                                <span class="order-id">#@item.OrderId</span>
+                                <span class="order-date">@item.OrderDate.ToString("dd.MM.yyyy HH:mm")</span>
+                            </td>
+                            <td>
+                                <div class="person-cell">
+                                    <div class="person-avatar">@(string.IsNullOrEmpty(initials) ? "?" : initials)</div>
+                                    <div>
+                                        <span class="person-name">@customerName</span>
+                                        <span class="person-sub">@item.Customer?.CustomerCity, @item.Customer?.CustomerCountry</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="product-name" title="@item.Product?.ProductName">@item.Product?.ProductName</span>
+                                <span class="person-sub">₺@unitPrice.ToString("N2") / adet</span>
+                            </td>
+                            <td class="text-center"><span class="qty">@item.Quantity</span></td>
+                            <td><span class="total">₺@total.ToString("N2")</span></td>
+                            <td><span class="soft-badge purple"><i class="zmdi @paymentIcon"></i> @item.PaymentMethod</span></td>
+                            <td>
+                                <span class="soft-badge @statusClass">@item.OrderStatus</span>
+                                @if (!string.IsNullOrWhiteSpace(item.OrderNotes))
+                                {
+                                    <i class="zmdi zmdi-comment-text note-icon" title="@item.OrderNotes"></i>
+                                }
+                            </td>
+                            <td class="text-right" style="white-space:nowrap;">
+                                <a href="/AdminOrder/UpdateOrder/@item.OrderId" class="action-btn edit" title="Güncelle">
+                                    <i class="zmdi zmdi-edit"></i>
+                                </a>
+                                <button type="button" class="action-btn delete" title="Sil"
+                                        data-toggle="modal" data-target="#deleteModal"
+                                        data-name="#@item.OrderId - @customerName"
+                                        data-url="/AdminOrder/DeleteOrder/@item.OrderId"
+                                        onclick="setDeleteModal(this)">
+                                    <i class="zmdi zmdi-delete"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="pager">
+                <span class="pager-info">Sayfa @currentPage.ToString("N0") / @totalPages.ToString("N0") · Toplam @totalCount.ToString("N0") sipariş</span>
+                <div class="pager-buttons">
+                    <a href="?page=1" class="pager-btn @(currentPage == 1 ? "disabled" : "")" title="İlk sayfa"><i class="zmdi zmdi-skip-previous"></i></a>
+                    <a href="?page=@(currentPage - 1)" class="pager-btn @(currentPage == 1 ? "disabled" : "")" title="Önceki"><i class="zmdi zmdi-chevron-left"></i></a>
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <a href="?page=@i" class="pager-btn @(i == currentPage ? "active" : "")">@i</a>
+                    }
+
+                    <a href="?page=@(currentPage + 1)" class="pager-btn @(currentPage == totalPages ? "disabled" : "")" title="Sonraki"><i class="zmdi zmdi-chevron-right"></i></a>
+                    <a href="?page=@totalPages" class="pager-btn @(currentPage == totalPages ? "disabled" : "")" title="Son sayfa"><i class="zmdi zmdi-skip-next"></i></a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade delete-modal" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="delete-icon"><i class="zmdi zmdi-delete"></i></div>
+                <h4 style="font-weight:700;">Siparişi Sil</h4>
+                <p class="m-b-0">Aşağıdaki siparişi silmek üzeresin:</p>
+                <span class="delete-name" id="deleteName"></span>
+                <p class="text-muted" style="font-size:13px;">
+                    <i class="zmdi zmdi-alert-triangle"></i> Bu işlem geri alınamaz.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Vazgeç</button>
+                <form id="deleteForm" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDeleteModal(button) {
+        document.getElementById("deleteName").innerText = button.getAttribute("data-name");
+        document.getElementById("deleteForm").setAttribute("action", button.getAttribute("data-url"));
+    }
+
+    function filterOrders() {
+        var search = document.getElementById("orderSearch").value.toLowerCase();
+        var rows = document.querySelectorAll("#orderList tr");
+        rows.forEach(function (row) {
+            row.style.display = row.innerText.toLowerCase().includes(search) ? "" : "none";
+        });
+    }
+</script>

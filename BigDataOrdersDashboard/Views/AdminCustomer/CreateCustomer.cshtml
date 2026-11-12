@@ -1,0 +1,411 @@
+﻿@model Customer
+@{
+    ViewData["Title"] = "Yeni Müşteri";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8a8f98;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+        .back-link:hover {
+            color: #f96332;
+            text-decoration: none;
+        }
+
+    .form-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .form-card-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 26px 30px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff;
+    }
+
+    .head-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        background: rgba(255, 255, 255, .2);
+    }
+
+    .form-card-head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .form-card-head p {
+        margin: 2px 0 0;
+        opacity: .85;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    .section-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        margin: 6px 0 14px;
+    }
+
+    .field {
+        margin-bottom: 18px;
+    }
+
+    .field-label {
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+        .input-icon > i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a3a8b1;
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .input-icon input {
+            width: 100%;
+            height: 48px;
+            border: 1.5px solid #e6e8ee;
+            border-radius: 12px;
+            padding: 0 16px 0 46px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+    .field textarea {
+        width: 100%;
+        border: 1.5px solid #e6e8ee;
+        border-radius: 12px;
+        padding: 13px 16px;
+        font-size: 15px;
+        outline: none;
+        resize: vertical;
+        min-height: 90px;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+        .input-icon input:focus,
+        .field textarea:focus {
+            border-color: #f96332;
+            box-shadow: 0 0 0 4px rgba(249, 99, 50, .12);
+        }
+
+    .field-hint {
+        font-size: 12px;
+        color: #a3a8b1;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-save {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(249, 99, 50, .3);
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        padding: 14px 24px;
+        border-radius: 12px;
+        background: #f3f4f7;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+        .btn-cancel:hover {
+            text-decoration: none;
+            color: #2d2d2d;
+        }
+
+    .profile-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+        text-align: center;
+    }
+
+    .profile-cover {
+        height: 90px;
+        background: linear-gradient(135deg, #f96332, #ffb199);
+    }
+
+    .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        margin: -48px auto 0;
+        border: 4px solid #fff;
+        background: linear-gradient(135deg, #f96332, #ffb199);
+        color: #fff;
+        font-size: 32px;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, .1);
+    }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .profile-body {
+        padding: 16px 24px 26px;
+    }
+
+    .profile-name {
+        font-size: 20px;
+        font-weight: 800;
+        color: #2d2d2d;
+        margin-top: 6px;
+    }
+
+    .profile-location {
+        color: #a3a8b1;
+        font-size: 13px;
+        margin-top: 2px;
+    }
+
+    .profile-info {
+        text-align: left;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #f0f1f4;
+    }
+
+        .profile-info div {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: #4b5563;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .profile-info i {
+            color: #f96332;
+            font-size: 16px;
+            width: 18px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <a href="/AdminCustomer/Index" class="back-link"><i class="zmdi zmdi-arrow-left"></i> Müşterilere dön</a>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="form-card-head">
+                    <div class="head-icon"><i class="zmdi zmdi-account-add"></i></div>
+                    <div>
+                        <h3>Yeni Müşteri</h3>
+                        <p>Sisteme yeni bir müşteri ekle</p>
+                    </div>
+                </div>
+
+                <div class="form-card-body">
+                    <form method="post">
+
+                        <div class="section-title">Kişisel Bilgiler</div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="CustomerName" class="field-label">Ad</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-account"></i>
+                                        <input asp-for="CustomerName" id="cName" placeholder="Örn: Ayşe" oninput="updatePreview()" />
+                                    </div>
+                                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="CustomerSurname" class="field-label">Soyad</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-account"></i>
+                                        <input asp-for="CustomerSurname" id="cSurname" placeholder="Örn: Yılmaz" oninput="updatePreview()" />
+                                    </div>
+                                    <span asp-validation-for="CustomerSurname" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="CustomerImageUrl" class="field-label">Profil Görseli URL</label>
+                            <div class="input-icon">
+                                <i class="zmdi zmdi-image"></i>
+                                <input asp-for="CustomerImageUrl" id="cImage" placeholder="https://..." oninput="updatePreview()" />
+                            </div>
+                            <span class="field-hint">Boş bırakılırsa ad ve soyadın baş harfleri gösterilir</span>
+                        </div>
+
+                        <div class="section-title">İletişim</div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="CustomerEmail" class="field-label">E-posta</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-email"></i>
+                                        <input asp-for="CustomerEmail" id="cEmail" type="email" placeholder="ornek@mail.com" oninput="updatePreview()" />
+                                    </div>
+                                    <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="field">
+                                    <label asp-for="CustomerPhone" class="field-label">Telefon</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-phone"></i>
+                                        <input asp-for="CustomerPhone" id="cPhone" placeholder="05xx xxx xx xx" oninput="updatePreview()" />
+                                    </div>
+                                    <span asp-validation-for="CustomerPhone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-title">Adres</div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="field">
+                                    <label asp-for="CustomerCountry" class="field-label">Ülke</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-globe"></i>
+                                        <input asp-for="CustomerCountry" id="cCountry" placeholder="Türkiye" oninput="updatePreview()" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field">
+                                    <label asp-for="CustomerCity" class="field-label">Şehir</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-city"></i>
+                                        <input asp-for="CustomerCity" id="cCity" placeholder="İstanbul" oninput="updatePreview()" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field">
+                                    <label asp-for="CustomerDistrict" class="field-label">İlçe</label>
+                                    <div class="input-icon">
+                                        <i class="zmdi zmdi-pin"></i>
+                                        <input asp-for="CustomerDistrict" id="cDistrict" placeholder="Kadıköy" oninput="updatePreview()" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label asp-for="CustomerAddress" class="field-label">Açık Adres</label>
+                            <textarea asp-for="CustomerAddress" id="cAddress" placeholder="Mahalle, sokak, bina no..." oninput="updatePreview()"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save"><i class="zmdi zmdi-check"></i> Müşteriyi Kaydet</button>
+                            <a href="/AdminCustomer/Index" class="btn-cancel">Vazgeç</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="profile-card">
+                <div class="profile-cover"></div>
+                <div class="profile-avatar" id="prevAvatar">?</div>
+                <div class="profile-body">
+                    <div class="profile-name" id="prevName">Ad Soyad</div>
+                    <div class="profile-location" id="prevLocation">Şehir, Ülke</div>
+                    <div class="profile-info">
+                        <div><i class="zmdi zmdi-email"></i> <span id="prevEmail">E-posta</span></div>
+                        <div><i class="zmdi zmdi-phone"></i> <span id="prevPhone">Telefon</span></div>
+                        <div><i class="zmdi zmdi-pin"></i> <span id="prevAddress">Adres</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function val(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    function updatePreview() {
+        var name = val("cName");
+        var surname = val("cSurname");
+        var image = val("cImage");
+        var city = val("cCity");
+        var country = val("cCountry");
+        var district = val("cDistrict");
+
+        document.getElementById("prevName").innerText = (name + " " + surname).trim() || "Ad Soyad";
+        document.getElementById("prevLocation").innerText = [city, country].filter(Boolean).join(", ") || "Şehir, Ülke";
+        document.getElementById("prevEmail").innerText = val("cEmail") || "E-posta";
+        document.getElementById("prevPhone").innerText = val("cPhone") || "Telefon";
+        document.getElementById("prevAddress").innerText = [val("cAddress"), district].filter(Boolean).join(", ") || "Adres";
+
+        var initials = ((name.charAt(0) || "") + (surname.charAt(0) || "")).toUpperCase() || "?";
+        var avatar = document.getElementById("prevAvatar");
+        if (image.startsWith("http")) {
+            avatar.innerHTML = '<img src="' + image + '" onerror="this.parentNode.innerText=\'' + initials + '\'" />';
+        } else {
+            avatar.innerText = initials;
+        }
+    }
+</script>
