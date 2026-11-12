@@ -1,0 +1,479 @@
+﻿@model NumericStatisticsModel
+@{
+    ViewData["Title"] = "Sayısal İstatistikler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 26px;
+    }
+
+        .page-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .page-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .update-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, .05);
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .update-pill .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+    .hero-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        padding: 28px 30px;
+        margin-bottom: 26px;
+        color: #fff;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        box-shadow: 0 14px 34px rgba(249, 99, 50, .28);
+    }
+
+        .hero-card::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .12);
+        }
+
+        .hero-card .row {
+            position: relative;
+            z-index: 1;
+        }
+
+    .hero-item {
+        padding: 6px 0;
+    }
+
+        .hero-item span {
+            display: block;
+            font-size: 13px;
+            opacity: .85;
+            font-weight: 600;
+        }
+
+        .hero-item h3 {
+            margin: 6px 0 0;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            white-space: nowrap;
+        }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        margin: 6px 0 14px;
+    }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eceef2;
+        }
+
+    .kpi-row {
+        margin-bottom: 12px;
+    }
+
+        .kpi-row > [class*="col"] {
+            display: flex;
+            margin-bottom: 18px;
+        }
+
+    .kpi {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+        .kpi:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .08);
+        }
+
+    .kpi-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .kpi-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+    }
+
+        .kpi-icon.orange {
+            background: rgba(249, 99, 50, .12);
+            color: #f96332;
+        }
+
+        .kpi-icon.green {
+            background: rgba(16, 185, 129, .12);
+            color: #059669;
+        }
+
+        .kpi-icon.blue {
+            background: rgba(59, 130, 246, .12);
+            color: #2563eb;
+        }
+
+        .kpi-icon.purple {
+            background: rgba(124, 58, 237, .12);
+            color: #7c3aed;
+        }
+
+        .kpi-icon.amber {
+            background: rgba(245, 158, 11, .14);
+            color: #d97706;
+        }
+
+        .kpi-icon.red {
+            background: rgba(225, 29, 72, .12);
+            color: #e11d48;
+        }
+
+        .kpi-icon.cyan {
+            background: rgba(6, 182, 212, .12);
+            color: #0891b2;
+        }
+
+    .kpi-tag {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: #f3f4f7;
+        color: #8a8f98;
+    }
+
+    .kpi-value {
+        margin: 18px 0 2px;
+        font-size: 26px;
+        font-weight: 800;
+        color: #2d2d2d;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+    }
+
+    .kpi-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .kpi-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: #f0f1f4;
+        margin-top: 14px;
+        overflow: hidden;
+    }
+
+        .kpi-bar div {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+    .kpi-product {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        padding: 6px 10px;
+        border-radius: 10px;
+        background: #f8f9fb;
+        color: #4b5563;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .kpi-product i {
+            color: #a3a8b1;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="page-hero">
+        <div>
+            <h2>Sayısal İstatistikler</h2>
+            <p>500.000+ siparişin sayılarla genel görünümü</p>
+        </div>
+        <span class="update-pill"><span class="dot"></span> Son güncelleme: <span id="LastUpdate">@DateTime.Now.ToString("HH:mm")</span></span>
+    </div>
+
+    <div class="hero-card">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="hero-item">
+                    <span>Toplam Ciro</span>
+                    <h3 id="TotalRevenue">₺@Model.TotalRevenue.ToString("N0")</h3>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="hero-item">
+                    <span>Toplam Sipariş</span>
+                    <h3 id="TotalOrderCount">@Model.TotalOrder.ToString("N0")</h3>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="hero-item">
+                    <span>Ortalama Sepet Tutarı</span>
+                    <h3 id="AverageBasket">₺@Model.AverageBasket.ToString("N2")</h3>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="hero-item">
+                    <span>Satılan Ürün Adedi</span>
+                    <h3 id="TotalQuantitySold">@Model.TotalQuantitySold.ToString("N0")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="zmdi zmdi-shopping-cart"></i> Siparişler</div>
+    <div class="row kpi-row">
+        <div class="col-lg col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon blue"><i class="zmdi zmdi-calendar"></i></div>
+                    <span class="kpi-tag">Bu Ay</span>
+                </div>
+                <div class="kpi-value" id="ThisMonthOrderCount">@Model.ThisMonthOrderCount.ToString("N0")</div>
+                <div class="kpi-label">Bu Ayki Sipariş</div>
+            </div>
+        </div>
+        <div class="col-lg col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon green"><i class="zmdi zmdi-check-circle"></i></div>
+                    <span class="kpi-tag">Durum</span>
+                </div>
+                <div class="kpi-value" id="CompletedOrderCount">@Model.CompletedOrderCount.ToString("N0")</div>
+                <div class="kpi-label">Tamamlanan Sipariş</div>
+                <div class="kpi-bar"><div style="width:@(Model.TotalOrder > 0 ? Model.CompletedOrderCount * 100 / Model.TotalOrder : 0)%; background:#10b981;"></div></div>
+            </div>
+        </div>
+        <div class="col-lg col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon amber"><i class="zmdi zmdi-time"></i></div>
+                    <span class="kpi-tag">Durum</span>
+                </div>
+                <div class="kpi-value" id="PendingOrderCount">@Model.PendingOrderCount.ToString("N0")</div>
+                <div class="kpi-label">Bekleyen Sipariş</div>
+                <div class="kpi-bar"><div style="width:@(Model.TotalOrder > 0 ? Model.PendingOrderCount * 100 / Model.TotalOrder : 0)%; background:#f59e0b;"></div></div>
+            </div>
+        </div>
+        <div class="col-lg col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon blue"><i class="zmdi zmdi-truck"></i></div>
+                    <span class="kpi-tag">Durum</span>
+                </div>
+                <div class="kpi-value" id="ShippedOrderCount">@Model.ShippedOrderCount.ToString("N0")</div>
+                <div class="kpi-label">Kargodaki Sipariş</div>
+                <div class="kpi-bar"><div style="width:@(Model.TotalOrder > 0 ? Model.ShippedOrderCount * 100 / Model.TotalOrder : 0)%; background:#3b82f6;"></div></div>
+            </div>
+        </div>
+        <div class="col-lg col-md-12">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon red"><i class="zmdi zmdi-close-circle"></i></div>
+                    <span class="kpi-tag">Durum</span>
+                </div>
+                <div class="kpi-value" id="CancelledOrderCount">@Model.CancelledOrderCount.ToString("N0")</div>
+                <div class="kpi-label">İptal Edilen Sipariş</div>
+                <div class="kpi-bar"><div style="width:@(Model.TotalOrder > 0 ? Model.CancelledOrderCount * 100 / Model.TotalOrder : 0)%; background:#e11d48;"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="zmdi zmdi-shopping-basket"></i> Ürünler</div>
+    <div class="row kpi-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon orange"><i class="zmdi zmdi-shopping-basket"></i></div>
+                    <span class="kpi-tag">Katalog</span>
+                </div>
+                <div class="kpi-value" id="TotalProductCount">@Model.TotalProductCount.ToString("N0")</div>
+                <div class="kpi-label">Toplam Ürün</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon purple"><i class="zmdi zmdi-labels"></i></div>
+                    <span class="kpi-tag">Katalog</span>
+                </div>
+                <div class="kpi-value" id="TotalCategoryCount">@Model.TotalCategoryCount.ToString("N0")</div>
+                <div class="kpi-label">Toplam Kategori</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon green"><i class="zmdi zmdi-trending-up"></i></div>
+                    <span class="kpi-tag">Fiyat</span>
+                </div>
+                <div class="kpi-value" id="MaxProductPrice">₺@Model.MaxProductPrice.ToString("N2")</div>
+                <div class="kpi-label">En Yüksek Ürün Fiyatı</div>
+                <div class="kpi-product" title="@Model.MaxPriceProductName">
+                    <i class="zmdi zmdi-shopping-basket"></i> @Model.MaxPriceProductName
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon cyan"><i class="zmdi zmdi-trending-down"></i></div>
+                    <span class="kpi-tag">Fiyat</span>
+                </div>
+                <div class="kpi-value" id="MinProductPrice">₺@Model.MinProductPrice.ToString("N2")</div>
+                <div class="kpi-label">En Düşük Ürün Fiyatı</div>
+                <div class="kpi-product" title="@Model.MinPriceProductName">
+                    <i class="zmdi zmdi-shopping-basket"></i> @Model.MinPriceProductName
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon blue"><i class="zmdi zmdi-money"></i></div>
+                    <span class="kpi-tag">Fiyat</span>
+                </div>
+                <div class="kpi-value" id="AveragePrice">₺@Model.AverageProductPrice.ToString("N2")</div>
+                <div class="kpi-label">Ortalama Ürün Fiyatı</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon green"><i class="zmdi zmdi-layers"></i></div>
+                    <span class="kpi-tag">Stok</span>
+                </div>
+                <div class="kpi-value" id="TotalStock">@Model.TotalQuantityCount.ToString("N0")</div>
+                <div class="kpi-label">Toplam Stok Adedi</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon amber"><i class="zmdi zmdi-balance-wallet"></i></div>
+                    <span class="kpi-tag">Stok</span>
+                </div>
+                <div class="kpi-value" id="StockValue">₺@Model.TotalStockValue.ToString("N0")</div>
+                <div class="kpi-label">Toplam Stok Değeri</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon red"><i class="zmdi zmdi-alert-triangle"></i></div>
+                    <span class="kpi-tag">Stok</span>
+                </div>
+                <div class="kpi-value" id="CriticalStockCount">@Model.CriticalStockProductCount.ToString("N0")</div>
+                <div class="kpi-label">Kritik Stoktaki Ürün (50 adetin altında)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="zmdi zmdi-accounts"></i> Müşteriler</div>
+    <div class="row kpi-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon orange"><i class="zmdi zmdi-accounts"></i></div>
+                    <span class="kpi-tag">Toplam</span>
+                </div>
+                <div class="kpi-value" id="TotalCustomerCount">@Model.TotalCustomerCount.ToString("N0")</div>
+                <div class="kpi-label">Toplam Müşteri</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon blue"><i class="zmdi zmdi-globe"></i></div>
+                    <span class="kpi-tag">Konum</span>
+                </div>
+                <div class="kpi-value" id="CountryCount">@Model.DistinctCountryCount.ToString("N0")</div>
+                <div class="kpi-label">Farklı Ülke</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon red"><i class="zmdi zmdi-account-o"></i></div>
+                    <span class="kpi-tag">Pasif</span>
+                </div>
+                <div class="kpi-value" id="InactiveCustomerCount">@Model.InactiveCustomerCount.ToString("N0")</div>
+                <div class="kpi-label">Hiç Sipariş Vermemiş Müşteri</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="kpi">
+                <div class="kpi-top">
+                    <div class="kpi-icon purple"><i class="zmdi zmdi-star"></i></div>
+                    <span class="kpi-tag">En İyi</span>
+                </div>
+                <div class="kpi-value" id="TopCustomerOrderCount">@Model.TopCustomerOrderCount.ToString("N0")</div>
+                <div class="kpi-label">En Çok Sipariş Veren Müşteri</div>
+                <div class="kpi-product" title="@Model.TopCustomerName">
+                    <i class="zmdi zmdi-account"></i> @Model.TopCustomerName
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
