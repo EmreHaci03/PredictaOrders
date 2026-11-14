@@ -1,0 +1,495 @@
+﻿@{
+    ViewData["Title"] = "Metinsel İstatistikler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+}
+
+<style>
+    .page-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 26px;
+    }
+
+        .page-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .page-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .update-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, .05);
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .update-pill .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        margin: 6px 0 14px;
+    }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eceef2;
+        }
+
+    .win-row {
+        margin-bottom: 12px;
+    }
+
+        .win-row > [class*="col"] {
+            display: flex;
+            margin-bottom: 18px;
+        }
+
+    .winner {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+        .winner:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .08);
+        }
+
+        .winner::after {
+            content: "";
+            position: absolute;
+            right: -30px;
+            bottom: -30px;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            opacity: .08;
+            background: currentColor;
+        }
+
+    .winner-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .winner-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+    }
+
+    .winner-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #8a8f98;
+    }
+
+    .winner-name {
+        margin: 18px 0 4px;
+        font-size: 20px;
+        font-weight: 800;
+        color: #2d2d2d;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .winner-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .c-orange {
+        color: #f96332;
+    }
+
+    .c-green {
+        color: #059669;
+    }
+
+    .c-blue {
+        color: #2563eb;
+    }
+
+    .c-purple {
+        color: #7c3aed;
+    }
+
+    .c-amber {
+        color: #d97706;
+    }
+
+    .c-red {
+        color: #e11d48;
+    }
+
+    .c-cyan {
+        color: #0891b2;
+    }
+
+    .c-pink {
+        color: #db2777;
+    }
+
+    .bg-orange {
+        background: rgba(249, 99, 50, .12);
+    }
+
+    .bg-green {
+        background: rgba(16, 185, 129, .12);
+    }
+
+    .bg-blue {
+        background: rgba(59, 130, 246, .12);
+    }
+
+    .bg-purple {
+        background: rgba(124, 58, 237, .12);
+    }
+
+    .bg-amber {
+        background: rgba(245, 158, 11, .14);
+    }
+
+    .bg-red {
+        background: rgba(225, 29, 72, .12);
+    }
+
+    .bg-cyan {
+        background: rgba(6, 182, 212, .12);
+    }
+
+    .bg-pink {
+        background: rgba(219, 39, 119, .12);
+    }
+
+    .rank-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .05);
+        overflow: hidden;
+    }
+
+    .rank-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 22px;
+        border-bottom: 1px solid #f0f1f4;
+        font-weight: 700;
+        color: #2d2d2d;
+    }
+
+        .rank-head i {
+            font-size: 18px;
+        }
+
+    .rank-list {
+        list-style: none;
+        margin: 0;
+        padding: 8px 0;
+    }
+
+        .rank-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 11px 22px;
+        }
+
+            .rank-list li:hover {
+                background: #fafbfc;
+            }
+
+    .rank-no {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        font-weight: 800;
+        background: #f3f4f7;
+        color: #8a8f98;
+    }
+
+    .rank-list li:nth-child(1) .rank-no {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .rank-list li:nth-child(2) .rank-no {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    .rank-list li:nth-child(3) .rank-no {
+        background: #ffedd5;
+        color: #c2410c;
+    }
+
+    .rank-name {
+        flex: 1;
+        min-width: 0;
+        font-weight: 600;
+        color: #2d2d2d;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .rank-value {
+        font-weight: 700;
+        color: #6b7280;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="page-hero">
+        <div>
+            <h2>Metinsel İstatistikler</h2>
+            <p>Öne çıkan ürünler, müşteriler, ülkeler ve satış eğilimleri</p>
+        </div>
+        <span class="update-pill"><span class="dot"></span> Son güncelleme: <span id="LastUpdate">@DateTime.Now.ToString("HH:mm")</span></span>
+    </div>
+
+    <div class="section-title"><i class="zmdi zmdi-shopping-basket"></i> Ürünler</div>
+    <div class="row win-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-orange">
+                <div class="winner-top">
+                    <div class="winner-icon bg-orange"><i class="zmdi zmdi-fire"></i></div>
+                    <div class="winner-title">En Çok Satan Ürün</div>
+                </div>
+                <div class="winner-name" id="TopSellingProductName" title="Bluetooth Hoparlör">@ViewBag.TopProductName</div>
+                <span class="winner-meta bg-orange"><i class="zmdi zmdi-layers"></i> <span id="TopSellingProductQuantity">@ViewBag.TopProductQuantity.ToString("N0")</span> adet</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-green">
+                <div class="winner-top">
+                    <div class="winner-icon bg-green"><i class="zmdi zmdi-money"></i></div>
+                    <div class="winner-title">En Çok Kazandıran Ürün</div>
+                </div>
+                <div class="winner-name" id="TopRevenueProductName" title="Kadın Deri Cüzdan">@ViewBag.TopRevenueProductName</div>
+                <span class="winner-meta bg-green"><i class="zmdi zmdi-trending-up"></i> ₺<span id="TopRevenueProductAmount">@ViewBag.TopRevenueProductAmount.ToString("N2")</span></span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-purple">
+                <div class="winner-top">
+                    <div class="winner-icon bg-purple"><i class="zmdi zmdi-labels"></i></div>
+                    <div class="winner-title">En Popüler Kategori</div>
+                </div>
+                <div class="winner-name" id="TopCategoryName" title="Elektronik">@ViewBag.TopCategoryName</div>
+                <span class="winner-meta bg-purple"><i class="zmdi zmdi-shopping-cart"></i> <span id="TopCategoryOrderCount">@ViewBag.TopCategoryOrderCount</span> sipariş</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-red">
+                <div class="winner-top">
+                    <div class="winner-icon bg-red"><i class="zmdi zmdi-alert-triangle"></i></div>
+                    <div class="winner-title">Stoğu En Az Ürün</div>
+                </div>
+                <div class="winner-name" id="LowestStockProductName" title="Masa Lambası">@ViewBag.LowestStockName</div>
+                <span class="winner-meta bg-red"><i class="zmdi zmdi-layers"></i> <span id="LowestStockQuantity">@ViewBag.LowestStock</span> adet kaldı</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="zmdi zmdi-accounts"></i> Müşteriler &amp; Konum</div>
+    <div class="row win-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-amber">
+                <div class="winner-top">
+                    <div class="winner-icon bg-amber"><i class="zmdi zmdi-star"></i></div>
+                    <div class="winner-title">En Sadık Müşteri</div>
+                </div>
+                <div class="winner-name" id="TopCustomerName" title="@ViewBag.MostLoyalCustomerName">@ViewBag.MostLoyalCustomerName</div>
+                <span class="winner-meta bg-amber"><i class="zmdi zmdi-shopping-cart"></i> <span id="TopCustomerOrderCount">@ViewBag.MostLoyalCustomerOrderCount</span> sipariş</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-pink">
+                <div class="winner-top">
+                    <div class="winner-icon bg-pink"><i class="zmdi zmdi-balance-wallet"></i></div>
+                    <div class="winner-title">En Çok Harcayan Müşteri</div>
+                </div>
+                <div class="winner-name" id="TopSpenderName" title="Sevgi Tunç">@ViewBag.TopSpenderName</div>
+                <span class="winner-meta bg-pink"><i class="zmdi zmdi-money"></i> ₺<span id="TopSpenderAmount">@ViewBag.TopSpenderTotal.ToString("N0")</span></span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-blue">
+                <div class="winner-top">
+                    <div class="winner-icon bg-blue"><i class="zmdi zmdi-globe"></i></div>
+                    <div class="winner-title">En Çok Sipariş Gelen Ülke</div>
+                </div>
+                <div class="winner-name" id="TopCountryName" title="Türkiye">@ViewBag.TopCountryName</div>
+                <span class="winner-meta bg-blue"><i class="zmdi zmdi-shopping-cart"></i> <span id="TopCountryOrderCount">@ViewBag.TopCountryCount.ToString("N0")</span> sipariş</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-cyan">
+                <div class="winner-top">
+                    <div class="winner-icon bg-cyan"><i class="zmdi zmdi-city"></i></div>
+                    <div class="winner-title">En Çok Sipariş Gelen Şehir</div>
+                </div>
+                <div class="winner-name" id="TopCityName" title="@ViewBag.TopCityName">@ViewBag.TopCityName</div>
+                <span class="winner-meta bg-cyan"><i class="zmdi zmdi-shopping-cart"></i> <span id="TopCityOrderCount">@ViewBag.TopCityOrderCount.ToString("N0")</span> sipariş</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="zmdi zmdi-time"></i> Satış Eğilimleri</div>
+    <div class="row win-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-purple">
+                <div class="winner-top">
+                    <div class="winner-icon bg-purple"><i class="zmdi zmdi-card"></i></div>
+                    <div class="winner-title">En Çok Kullanılan Ödeme</div>
+                </div>
+                <div class="winner-name" id="TopPaymentMethod" title="Kredi Kartı">@ViewBag.TopPaymentMethodName</div>
+                <span class="winner-meta bg-purple"><i class="zmdi zmdi-chart-donut"></i> %<span id="TopPaymentPercentage">@ViewBag.TopPaymentMethodCount</span> pay</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-green">
+                <div class="winner-top">
+                    <div class="winner-icon bg-green"><i class="zmdi zmdi-calendar-check"></i></div>
+                    <div class="winner-title">Bugünkü Satışlar</div>
+                </div>
+                <div class="winner-name" id="TodayOrderCount">@ViewBag.TodayOrderCount.ToString("N0") sipariş</div>
+                <span class="winner-meta bg-green"><i class="zmdi zmdi-layers"></i> <span id="TodayQuantitySold">@ViewBag.TodayQuantitySold.ToString("N0")</span> adet satıldı</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-red">
+                <div class="winner-top">
+                    <div class="winner-icon bg-red"><i class="zmdi zmdi-close-circle"></i></div>
+                    <div class="winner-title">En Çok İptal Edilen Ürün</div>
+                </div>
+                <div class="winner-name" id="MostCancelledProductName" title="@ViewBag.MostCancelledProductName">@(ViewBag.MostCancelledProductName ?? "-")</div>
+                <span class="winner-meta bg-red"><i class="zmdi zmdi-block"></i> <span id="MostCancelledCount">@ViewBag.MostCancelledCount.ToString("N0")</span> iptal</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="winner c-blue">
+                <div class="winner-top">
+                    <div class="winner-icon bg-blue"><i class="zmdi zmdi-time-restore"></i></div>
+                    <div class="winner-title">Son Sipariş</div>
+                </div>
+                <div class="winner-name" id="LastOrderCustomer" title="@ViewBag.LastOrderCustomer">@(ViewBag.LastOrderCustomer ?? "-")</div>
+                <span class="winner-meta bg-blue"><i class="zmdi zmdi-shopping-cart"></i> <span id="LastOrderProduct">@ViewBag.LastOrderProduct</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><i class="zmdi zmdi-format-list-numbered"></i> İlk 5 Listeleri</div>
+    <div class="row win-row">
+        <div class="col-lg-4 col-md-6">
+            <div class="rank-card">
+                <div class="rank-head"><i class="zmdi zmdi-fire c-orange"></i> En Çok Satan 5 Ürün</div>
+                @if (ViewBag.TopSellingProductList != null)
+                {
+                    <ul class="rank-list" id="TopProductsList">
+                        @foreach (var item in ViewBag.TopSellingProductList)
+                        {
+                            <li><span class="rank-no">@item.ProductId</span><span class="rank-name">@item.Name</span><span class="rank-value">@item.Count.ToString("N0") adet</span></li>
+
+                        }
+
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="rank-card">
+                <div class="rank-head"><i class="zmdi zmdi-star c-amber"></i> En Sadık 5 Müşteri</div>
+                @if (ViewBag.Top5LoyalCustomers != null)
+                {
+                    <ul class="rank-list" id="TopCustomersList">
+                        @foreach (var item in ViewBag.Top5LoyalCustomers)
+                        {
+                            <li><span class="rank-no">@item.Id</span><span class="rank-name">@item.Name</span><span class="rank-value">@item.Count sipariş</span></li>
+
+                        }
+                    </ul>
+                }
+
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-12">
+            <div class="rank-card">
+                <div class="rank-head"><i class="zmdi zmdi-globe c-blue"></i> En Çok Sipariş Gelen 5 Ülke</div>
+                <ul class="rank-list" id="TopCountriesList">
+                    @if (ViewBag.TopOrderCountry != null)
+                    {
+                        int rank = 1;
+                        foreach (var item in ViewBag.TopOrderCountry)
+                        {
+                            <li>
+                                <span class="rank-no">@rank</span>
+                                <span class="rank-name">@item.Country</span>
+                                <span class="rank-value">@item.OrderCount.ToString("N0") sipariş</span>
+                            </li>
+                            rank++;
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
