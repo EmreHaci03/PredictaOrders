@@ -1,0 +1,73 @@
+﻿@{
+    int count = 0;
+}
+<div class="row dash-row">
+    <div class="col-lg-8">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Son Siparişler</h5>
+                <a href="/AdminOrder/Index"><small>Tümünü gör →</small></a>
+            </div>
+            <div class="table-responsive">
+                <table class="dash-table" id="RecentOrdersTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Müşteri</th>
+                            <th>Ürün</th>
+                            <th>Adet</th>
+                            <th>Tutar</th>
+                            <th>Durum</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ViewBag.LastOrders)
+                        {
+                            count++;
+
+                            string statusClass = item.Status switch
+                            {
+                                "Tamamlandı" => "st-green",
+                                "Kargoda" => "st-blue",
+                                "Beklemede" => "st-amber",
+                                "İptal Edildi" => "st-red",
+                                _ => ""
+                            };
+
+                            <tr>
+                                <td>@count</td>
+                                <td class="strong">@item.NameSurname</td>
+                                <td>@item.ProductName</td>
+                                <td>@item.Quantity</td>
+                                <td class="strong">₺@item.Amount.ToString("N2")</td>
+                                <td><span class="st @statusClass">@item.Status</span></td>
+                                <td>@item.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>En Çok Harcayan Müşteriler</h5>
+                <small>İlk 5</small>
+            </div>
+            @if (ViewBag.TopSpenders != null)
+            {
+                <ul class="mini-list" id="TopSpendersList">
+                    @foreach (var item in ViewBag.TopSpenders)
+                    {
+                        <li><span class="mini-avatar">@item.Name.Substring(0,1) @item.Surname.Substring(0,1)</span><span class="mini-name">@item.Name @item.Surname<small>@item.Country</small></span><span class="mini-value">₺@item.Sum.ToString("N2")</span></li>
+
+                    }
+
+                </ul>
+            }
+
+        </div>
+    </div>
+</div>

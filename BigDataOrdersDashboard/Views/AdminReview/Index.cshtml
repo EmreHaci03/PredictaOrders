@@ -1,0 +1,654 @@
+﻿@model List<Review>
+@{
+    ViewData["Title"] = "Yorumlar";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int pageSize = ViewBag.PageSize ?? 100;
+    string search = ViewBag.Search as string ?? "";
+    string searchQuery = Uri.EscapeDataString(search);
+    int count = (currentPage - 1) * pageSize;
+}
+
+@functions {
+    string SentimentClass(string? s) => s?.ToLower() switch
+    {
+        "positive" or "olumlu" => "sn-green",
+        "negative" or "olumsuz" => "sn-red",
+        "neutral" or "nötr" => "sn-gray",
+        _ => "sn-gray"
+    };
+
+    string SentimentText(string? s) => s?.ToLower() switch
+    {
+        "positive" => "Olumlu",
+        "negative" => "Olumsuz",
+        "neutral" => "Nötr",
+        _ => s ?? "-"
+    };
+}
+
+<style>
+    .page-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .page-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .page-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #f96332, #ff8a5c);
+        color: #fff;
+        border: none;
+        border-radius: 14px;
+        padding: 11px 20px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(249,99,50,.28);
+        text-decoration: none;
+        transition: transform .15s;
+    }
+
+        .btn-hero:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+    .rv-stats > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .rv-stat {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 20px 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .rv-stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .rv-stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .rv-stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-amber {
+        background: rgba(245,158,11,.14);
+        color: #d97706;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-red {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .rv-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        padding: 22px;
+    }
+
+    .rv-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .rv-search {
+        display: flex;
+        gap: 8px;
+    }
+
+        .rv-search input {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 9px 14px;
+            min-width: 260px;
+            outline: none;
+        }
+
+            .rv-search input:focus {
+                border-color: #f96332;
+            }
+
+    .btn-orange {
+        background: #f96332;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 9px 18px;
+        font-weight: 700;
+    }
+
+        .btn-orange:hover {
+            background: #e8541f;
+            color: #fff;
+        }
+
+    .rv-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .rv-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .rv-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        .rv-table tr:hover td {
+            background: #fafbfc;
+        }
+
+    .rv-customer {
+        font-weight: 700;
+        color: #2d2d2d;
+    }
+
+    .rv-product {
+        font-size: 12px;
+        color: #a3a8b1;
+        margin-top: 2px;
+    }
+
+    .rv-text {
+        max-width: 420px;
+        color: #4b5563;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .stars {
+        color: #f59e0b;
+        white-space: nowrap;
+        font-size: 15px;
+    }
+
+        .stars .off {
+            color: #e5e7eb;
+        }
+
+    .sn {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .sn-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .sn-red {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .sn-gray {
+        background: #f3f4f7;
+        color: #6b7280;
+    }
+
+    .pt {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #f3f4f7;
+        color: #6b7280;
+    }
+
+    .row-actions {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        border: none;
+        display: inline-grid;
+        place-items: center;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .15s, color .15s;
+    }
+
+    .btn-edit {
+        background: rgba(59,130,246,.10);
+        color: #2563eb;
+    }
+
+        .btn-edit:hover {
+            background: #2563eb;
+            color: #fff;
+        }
+
+    .btn-delete {
+        background: rgba(225,29,72,.10);
+        color: #e11d48;
+    }
+
+        .btn-delete:hover {
+            background: #e11d48;
+            color: #fff;
+        }
+
+    .rv-pager {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+        .rv-pager .info {
+            color: #8a8f98;
+            font-size: 13px;
+        }
+
+        .rv-pager .pages a, .rv-pager .pages span {
+            display: inline-block;
+            min-width: 36px;
+            padding: 7px 10px;
+            margin-left: 4px;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            color: #4b5563;
+            background: #f3f4f7;
+            text-decoration: none;
+        }
+
+            .rv-pager .pages a:hover {
+                background: rgba(249,99,50,.15);
+                color: #f96332;
+            }
+
+        .rv-pager .pages .active {
+            background: #f96332;
+            color: #fff;
+        }
+
+        .rv-pager .pages .disabled {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+    /* ===== Silme modalı ===== */
+    .dm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(17,24,39,.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 16px;
+    }
+
+        .dm-overlay.show {
+            display: flex;
+        }
+
+    .dm-box {
+        background: #fff;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 420px;
+        padding: 28px;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(0,0,0,.2);
+        animation: dmIn .18s ease-out;
+    }
+
+    @@keyframes dmIn {
+        from {
+            transform: translateY(12px) scale(.97);
+            opacity: 0;
+        }
+
+        to {
+            transform: none;
+            opacity: 1;
+        }
+    }
+
+    .dm-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        margin: 0 auto 16px;
+        display: grid;
+        place-items: center;
+        font-size: 30px;
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .dm-box h4 {
+        margin: 0 0 8px;
+        font-weight: 800;
+        color: #2d2d2d;
+    }
+
+    .dm-box p {
+        margin: 0;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    .dm-target {
+        margin: 16px 0 22px;
+        padding: 12px;
+        border-radius: 12px;
+        background: #f8f9fb;
+        font-weight: 600;
+        color: #2d2d2d;
+    }
+
+        .dm-target small {
+            display: block;
+            color: #a3a8b1;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+    .dm-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+        .dm-actions button {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+    .dm-cancel {
+        background: #f3f4f7;
+        color: #4b5563;
+    }
+
+        .dm-cancel:hover {
+            background: #e5e7eb;
+        }
+
+    .dm-confirm {
+        background: #e11d48;
+        color: #fff;
+    }
+
+        .dm-confirm:hover {
+            background: #be123c;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="page-hero">
+        <div>
+            <h2>Yorumlar</h2>
+            <p>Müşterilerin ürünler hakkındaki değerlendirmeleri</p>
+        </div>
+        <a href="/AdminReview/CreateReview" class="btn-hero"><i class="zmdi zmdi-plus"></i> Yeni Yorum</a>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="row rv-stats">
+        <div class="col-lg-3 col-md-6">
+            <div class="rv-stat">
+                <div class="rv-stat-icon i-orange"><i class="zmdi zmdi-comment-text"></i></div>
+                <div>
+                    <div class="rv-stat-label">Toplam Yorum</div>
+                    <div class="rv-stat-value">@(((int)(ViewBag.TotalCount ?? 0)).ToString("N0"))</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="rv-stat">
+                <div class="rv-stat-icon i-amber"><i class="zmdi zmdi-star"></i></div>
+                <div>
+                    <div class="rv-stat-label">Ortalama Puan</div>
+                    <div class="rv-stat-value">@(((double)(ViewBag.AverageRating ?? 0.0)).ToString("N1")) / 5</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="rv-stat">
+                <div class="rv-stat-icon i-green"><i class="zmdi zmdi-mood"></i></div>
+                <div>
+                    <div class="rv-stat-label">Olumlu Yorum</div>
+                    <div class="rv-stat-value">@(((int)(ViewBag.PositiveCount ?? 0)).ToString("N0"))</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="rv-stat">
+                <div class="rv-stat-icon i-red"><i class="zmdi zmdi-mood-bad"></i></div>
+                <div>
+                    <div class="rv-stat-label">Olumsuz Yorum</div>
+                    <div class="rv-stat-value">@(((int)(ViewBag.NegativeCount ?? 0)).ToString("N0"))</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste -->
+    <div class="rv-card">
+        <div class="rv-toolbar">
+            <form method="get" class="rv-search">
+                <input type="text" name="search" value="@search" placeholder="Müşteri, ürün veya yorum ara..." />
+                <button type="submit" class="btn-orange"><i class="zmdi zmdi-search"></i> Ara</button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="rv-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Müşteri / Ürün</th>
+                        <th>Puan</th>
+                        <th>Yorum</th>
+                        <th>Duygu</th>
+                        <th>Alım Türü</th>
+                        <th>Tarih</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr><td colspan="8" style="text-align:center; color:#a3a8b1; padding:30px;">Yorum bulunamadı.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            count++;
+                            var customerName = $"{item.Customer?.CustomerName} {item.Customer?.CustomerSurname}";
+
+                            <tr>
+                                <td>@count</td>
+                                <td>
+                                    <div class="rv-customer">@customerName</div>
+                                    <div class="rv-product"><i class="zmdi zmdi-shopping-basket"></i> @item.Product?.ProductName</div>
+                                </td>
+                                <td>
+                                    <span class="stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="zmdi zmdi-star @(i <= item.Rating ? "" : "off")"></i>
+                                        }
+                                    </span>
+                                </td>
+                                <td><div class="rv-text" title="@item.ReviewText">@item.ReviewText</div></td>
+                                <td><span class="sn @SentimentClass(item.Sentiment)">@SentimentText(item.Sentiment)</span></td>
+                                <td><span class="pt">@item.PurchaseType</span></td>
+                                <td style="white-space:nowrap;">@item.ReviewDate.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a href="/AdminReview/UpdateReview/@item.ReviewId" class="btn-icon btn-edit" title="Güncelle">
+                                            <i class="zmdi zmdi-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn-icon btn-delete js-delete" title="Sil"
+                                                data-id="@item.ReviewId"
+                                                data-customer="@customerName"
+                                                data-product="@item.Product?.ProductName">
+                                            <i class="zmdi zmdi-delete"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sayfalama -->
+        <div class="rv-pager">
+            <div class="info">Sayfa @currentPage / @totalPages</div>
+            <div class="pages">
+                <a class="@(currentPage <= 1 ? "disabled" : "")" href="?page=@(currentPage - 1)&search=@searchQuery">‹</a>
+                @for (int p = Math.Max(1, currentPage - 2); p <= Math.Min(totalPages, currentPage + 2); p++)
+                {
+                    if (p == currentPage)
+                    {
+                        <span class="active">@p</span>
+                    }
+                    else
+                    {
+                        <a href="?page=@p&search=@searchQuery">@p</a>
+                    }
+                }
+                <a class="@(currentPage >= totalPages ? "disabled" : "")" href="?page=@(currentPage + 1)&search=@searchQuery">›</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== Silme modalı ===== -->
+<div class="dm-overlay" id="DeleteModal">
+    <div class="dm-box">
+        <div class="dm-icon"><i class="zmdi zmdi-delete"></i></div>
+        <h4>Yorum silinsin mi?</h4>
+        <p>Bu işlem geri alınamaz.</p>
+        <div class="dm-target">
+            <span id="DeleteCustomer">-</span>
+            <small id="DeleteProduct">-</small>
+        </div>
+        <form method="post" id="DeleteForm">
+            @Html.AntiForgeryToken()
+            <div class="dm-actions">
+                <button type="button" class="dm-cancel" id="DeleteCancel">Vazgeç</button>
+                <button type="submit" class="dm-confirm">Evet, Sil</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const modal = document.getElementById('DeleteModal');
+        const form = document.getElementById('DeleteForm');
+        const customerEl = document.getElementById('DeleteCustomer');
+        const productEl = document.getElementById('DeleteProduct');
+
+        // Sil butonuna basınca modalı doldur ve aç
+        document.querySelectorAll('.js-delete').forEach(btn => {
+            btn.addEventListener('click', () => {
+                form.action = '/AdminReview/DeleteReview/' + btn.dataset.id;
+                customerEl.textContent = btn.dataset.customer || '-';
+                productEl.textContent = btn.dataset.product || '-';
+                modal.classList.add('show');
+            });
+        });
+
+        // Kapatma: Vazgeç butonu, dışarı tıklama, ESC
+        const close = () => modal.classList.remove('show');
+        document.getElementById('DeleteCancel').addEventListener('click', close);
+        modal.addEventListener('click', e => { if (e.target === modal) close(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    })();
+</script>

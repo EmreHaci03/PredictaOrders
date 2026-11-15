@@ -3,31 +3,363 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-    <div class="block-header">
-        <div class="row">
-            <div class="col-lg-7 col-md-6 col-sm-12">
-                <h2>
-                    Stater Page
-                    <small class="text-muted">Welcome to Nexa Application</small>
-                </h2>
-            </div>
-            <div class="col-lg-5 col-md-6 col-sm-12">
-                <ul class="breadcrumb float-md-right">
-                    <li class="breadcrumb-item"><a href="index.html"><i class="zmdi zmdi-home"></i> Nexa</a></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0);">Extra</a></li>
-                    <li class="breadcrumb-item active">Stater Page</li>
-                </ul>
+<style>
+    .dash-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .dash-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .dash-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .update-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0,0,0,.05);
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .update-pill .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+    .dash-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .dash-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .dash-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .dash-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .dash-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+    }
+
+    .stat-trend {
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 2px;
+    }
+
+    .trend-up {
+        color: #059669;
+    }
+
+    .trend-down {
+        color: #e11d48;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 300px;
+    }
+
+        .chart-box.sm {
+            height: 260px;
+        }
+
+    .mini-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .mini-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f6f7f9;
+        }
+
+            .mini-list li:last-child {
+                border-bottom: none;
+            }
+
+    .mini-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 14px;
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+        flex-shrink: 0;
+    }
+
+    .mini-name {
+        flex: 1;
+        min-width: 0;
+        font-weight: 600;
+        color: #2d2d2d;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .mini-name small {
+            display: block;
+            color: #a3a8b1;
+            font-weight: 500;
+        }
+
+    .mini-value {
+        font-weight: 700;
+        color: #6b7280;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .dash-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .dash-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: left;
+        }
+
+        .dash-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .dash-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .dash-table .strong {
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+    .st {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .st-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .st-amber {
+        background: rgba(245,158,11,.14);
+        color: #b45309;
+    }
+
+    .st-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .st-red {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+</style>
+
+<!-- Chart.js + ortak ayarlar: component'lerden ÖNCE yüklenmeli -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+    const tl = v => '₺' + Number(v).toLocaleString('tr-TR');
+    const num = v => Number(v).toLocaleString('tr-TR');
+    Chart.defaults.color = '#8a8f98';
+    Chart.defaults.font.family = 'inherit';
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+</script>
+
+<div class="container-fluid">
+
+    <div class="dash-hero">
+        <div>
+            <h2>Dashboard</h2>
+            <p>Siparişler, müşteriler ve satışların genel görünümü</p>
+        </div>
+        <span class="update-pill"><span class="dot"></span> Son güncelleme: <span id="LastUpdate">@DateTime.Now.ToString("HH:mm")</span></span>
+    </div>
+
+    <!-- KPI KARTLARI -->
+    <div class="row dash-row">
+        <!-- Bugünkü kazanç -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dash-card stat">
+                <div class="stat-icon i-blue"><i class="zmdi zmdi-calendar-check"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">Bugünkü Kazanç</div>
+                    <div class="stat-value">₺<span id="TodayRevenue">@ViewBag.TodayRevenue.ToString("N2")</span></div>
+                    <div class="stat-trend" style="color:#8a8f98;">
+                        <i class="zmdi zmdi-shopping-cart"></i> <span id="TodayOrderCount">@ViewBag.TodayOrderCount.ToString("N0")</span> siparişten
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="container-fluid">
-        <div class="row clearfix">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="body">
-                        <h4>Emre page</h4>
+
+        <!-- Müşteri başına ortalama harcama -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dash-card stat">
+                <div class="stat-icon i-green"><i class="zmdi zmdi-account-circle"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">Müşteri Başına Harcama</div>
+                    <div class="stat-value">₺<span id="AverageSpendPerCustomer">@ViewBag.AverageSpendPerCustomer.ToString("N2")</span></div>
+                    <div class="stat-trend" style="color:#8a8f98;">
+                        <i class="zmdi zmdi-accounts"></i> <span id="ActiveCustomerCount">@ViewBag.ActiveCustomerCount.ToString("N0")</span> alışveriş yapan müşteri
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- En pahalı satış -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dash-card stat">
+                <div class="stat-icon i-purple"><i class="zmdi zmdi-diamond"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">En Pahalı Satış</div>
+                    <div class="stat-value">₺<span id="MostExpensiveSaleAmount">@ViewBag.MostExpensiveSaleAmount.ToString("N2")</span></div>
+                    <div class="stat-trend" style="color:#8a8f98; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+                         title="@ViewBag.MostExpensiveSaleCustomer · @ViewBag.MostExpensiveSaleProduct ×@ViewBag.MostExpensiveSaleQuantity">
+                        <i class="zmdi zmdi-account"></i>
+                        <span id="MostExpensiveSaleCustomer">@ViewBag.MostExpensiveSaleCustomer</span> ·
+                        <span id="MostExpensiveSaleProduct">@ViewBag.MostExpensiveSaleProduct</span>
+                        ×<span id="MostExpensiveSaleQuantity">@ViewBag.MostExpensiveSaleQuantity</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ortalama sepet büyüklüğü -->
+        <div class="col-lg-3 col-md-6">
+            <div class="dash-card stat">
+                <div class="stat-icon i-blue"><i class="zmdi zmdi-shopping-basket"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">Ortalama Sepet Büyüklüğü</div>
+                    <div class="stat-value"><span id="AverageQuantityPerOrder">@ViewBag.AverageQuantityPerOrder.ToString("N1")</span> adet</div>
+                    <div class="stat-trend" style="color:#8a8f98;">
+                        <i class="zmdi zmdi-layers"></i> En fazla <span id="MaxQuantityPerOrder">@ViewBag.MaxQuantityPerOrder</span> adet tek siparişte
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- AYLIK CİRO + SİPARİŞ DURUMU (component) -->
+    @await Component.InvokeAsync("DashboardSalesOverview") @*Tamamlandı*@
+
+    <!-- KATEGORİ + ÜLKE + ÖDEME -->
+    @await Component.InvokeAsync("DashboardDistributions") @*Tamamlandı*@
+
+    <!-- SON SİPARİŞLER + EN İYİ MÜŞTERİLER -->
+    @await Component.InvokeAsync("DashboardRecentActivity") @*Tamamlandı*@
+
+    <!-- YORUM ANALİZİ -->
+    @await Component.InvokeAsync("DashboardReviewInsights")
+
+</div>
+

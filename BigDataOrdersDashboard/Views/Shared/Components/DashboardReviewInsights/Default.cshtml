@@ -1,0 +1,436 @@
+﻿@{
+    var inv = System.Globalization.CultureInfo.InvariantCulture;
+
+    double avgRating = ViewBag.AverageRating;
+    int totalReviews = ViewBag.TotalReviewCount;
+    int fullStars = (int)Math.Round(avgRating);
+
+    double positiveRate = ViewBag.PositiveRate;
+    double neutralRate = ViewBag.NeutralRate;
+    double negativeRate = ViewBag.NegativeRate;
+
+    int minReviewCount = ViewBag.MinReviewCount;
+    var topRated = ViewBag.TopRatedProducts;
+    var lowestRated = ViewBag.LowestRatedProducts;
+
+    var best = ViewBag.BestReview;
+    var worst = ViewBag.WorstReview;
+}
+
+<style>
+    /* Puan dağılımı */
+    .rv-avg {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .rv-avg-num {
+        font-size: 42px;
+        font-weight: 800;
+        color: #2d2d2d;
+        line-height: 1;
+        letter-spacing: -.03em;
+    }
+
+    .rv-avg-stars {
+        color: #f59e0b;
+        font-size: 16px;
+    }
+
+        .rv-avg-stars .off {
+            color: #e5e7eb;
+        }
+
+    .rv-avg-sub {
+        color: #a3a8b1;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    .rv-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+
+    .rv-bar-label {
+        width: 28px;
+        color: #6b7280;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+        .rv-bar-label i {
+            color: #f59e0b;
+            font-size: 12px;
+        }
+
+    .rv-bar {
+        flex: 1;
+        height: 8px;
+        border-radius: 999px;
+        background: #f0f1f4;
+        overflow: hidden;
+    }
+
+        .rv-bar div {
+            height: 100%;
+            border-radius: 999px;
+            background: #f59e0b;
+        }
+
+    .rv-bar-count {
+        width: 48px;
+        text-align: right;
+        color: #a3a8b1;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .rv-sent-bar {
+        display: flex;
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 18px 0 10px;
+        background: #f0f1f4;
+    }
+
+        .rv-sent-bar div {
+            height: 100%;
+        }
+
+    .rv-sent-legend {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+        .rv-sent-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    .rv-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Ürün puanları */
+    .rv-sub-title {
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin: 4px 0 8px;
+    }
+
+    .rv-prod-list {
+        list-style: none;
+        margin: 0 0 14px;
+        padding: 0;
+    }
+
+        .rv-prod-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid #f6f7f9;
+        }
+
+            .rv-prod-list li:last-child {
+                border-bottom: none;
+            }
+
+    .rv-prod-name {
+        flex: 1;
+        min-width: 0;
+        font-weight: 600;
+        color: #2d2d2d;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .rv-prod-name small {
+            display: block;
+            color: #a3a8b1;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+    .rv-score {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+        .rv-score.good {
+            background: rgba(16,185,129,.12);
+            color: #059669;
+        }
+
+        .rv-score.bad {
+            background: rgba(225,29,72,.12);
+            color: #e11d48;
+        }
+
+    .rv-empty {
+        color: #a3a8b1;
+        font-size: 13px;
+        padding: 8px 0 14px;
+    }
+
+    /* Öne çıkan yorumlar */
+    .rv-quote {
+        position: relative;
+        border-radius: 14px;
+        padding: 16px 16px 14px;
+        margin-bottom: 12px;
+    }
+
+        .rv-quote:last-child {
+            margin-bottom: 0;
+        }
+
+        .rv-quote.good {
+            background: rgba(16,185,129,.07);
+            border-left: 4px solid #10b981;
+        }
+
+        .rv-quote.bad {
+            background: rgba(225,29,72,.06);
+            border-left: 4px solid #e11d48;
+        }
+
+    .rv-quote-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .rv-quote-tag {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .rv-quote.good .rv-quote-tag {
+        color: #059669;
+    }
+
+    .rv-quote.bad .rv-quote-tag {
+        color: #e11d48;
+    }
+
+    .rv-quote-stars {
+        color: #f59e0b;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+        .rv-quote-stars .off {
+            color: #e5e7eb;
+        }
+
+    .rv-quote-text {
+        color: #374151;
+        font-size: 14px;
+        line-height: 1.55;
+        font-style: italic;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .rv-quote-foot {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #8a8f98;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<div class="row dash-row">
+
+    <!-- ===== PUAN DAĞILIMI ===== -->
+    <div class="col-lg-4">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Puan Dağılımı</h5>
+                <a href="/AdminReview/Index"><small>Tüm yorumlar →</small></a>
+            </div>
+
+            <div class="rv-avg">
+                <div class="rv-avg-num" id="ReviewAverageRating">@avgRating.ToString("N1")</div>
+                <div>
+                    <div class="rv-avg-stars">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <i class="zmdi zmdi-star @(i <= fullStars ? "" : "off")"></i>
+                        }
+                    </div>
+                    <div class="rv-avg-sub"><span id="ReviewTotalCount">@totalReviews.ToString("N0")</span> değerlendirme</div>
+                </div>
+            </div>
+
+            <div id="RatingDistribution">
+                @if (ViewBag.RatingCountList != null)
+                {
+                    foreach (var item in ViewBag.RatingCountList)
+                    {
+                        int count = item.Count;
+                        double width = totalReviews > 0 ? count * 100.0 / totalReviews : 0;
+
+                        <div class="rv-bar-row">
+                            <span class="rv-bar-label">@item.Rating <i class="zmdi zmdi-star"></i></span>
+                            <div class="rv-bar"><div style="width:@width.ToString("0.#", inv)%"></div></div>
+                            <span class="rv-bar-count">@count.ToString("N0")</span>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div class="rv-sent-bar">
+                <div style="width:@positiveRate.ToString("0.#", inv)%; background:#10b981;" title="Olumlu"></div>
+                <div style="width:@neutralRate.ToString("0.#", inv)%; background:#cbd5e1;" title="Nötr"></div>
+                <div style="width:@negativeRate.ToString("0.#", inv)%; background:#e11d48;" title="Olumsuz"></div>
+            </div>
+            <div class="rv-sent-legend">
+                <span style="color:#059669;"><i class="rv-dot" style="background:#10b981;"></i> Olumlu %<span id="PositiveRate">@positiveRate.ToString("N0")</span></span>
+                <span style="color:#6b7280;"><i class="rv-dot" style="background:#cbd5e1;"></i> Nötr %<span id="NeutralRate">@neutralRate.ToString("N0")</span></span>
+                <span style="color:#e11d48;"><i class="rv-dot" style="background:#e11d48;"></i> Olumsuz %<span id="NegativeRate">@negativeRate.ToString("N0")</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ÜRÜN PUANLARI ===== -->
+    <div class="col-lg-4">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Ürün Puanları</h5>
+                <small>En az @minReviewCount yorum</small>
+            </div>
+
+            <div class="rv-sub-title" style="color:#059669;"><i class="zmdi zmdi-thumb-up"></i> En Beğenilenler</div>
+            @if (topRated == null || topRated.Count == 0)
+            {
+                <div class="rv-empty">Yeterli yorumu olan ürün yok.</div>
+            }
+            else
+            {
+                <ul class="rv-prod-list" id="TopRatedProducts">
+                    @foreach (var p in topRated)
+                    {
+                        double avg = p.AverageRating;
+                        int reviewCount = p.ReviewCount;
+                        <li>
+                            <span class="rv-prod-name" title="@p.Name">@p.Name<small>@reviewCount.ToString("N0") yorum</small></span>
+                            <span class="rv-score good"><i class="zmdi zmdi-star"></i> @avg.ToString("N1")</span>
+                        </li>
+                    }
+                </ul>
+            }
+
+            <div class="rv-sub-title" style="color:#e11d48;"><i class="zmdi zmdi-thumb-down"></i> En Az Beğenilenler</div>
+            @if (lowestRated == null || lowestRated.Count == 0)
+            {
+                <div class="rv-empty">Yeterli yorumu olan ürün yok.</div>
+            }
+            else
+            {
+                <ul class="rv-prod-list" id="LowestRatedProducts">
+                    @foreach (var p in lowestRated)
+                    {
+                        double avg = p.AverageRating;
+                        int reviewCount = p.ReviewCount;
+                        <li>
+                            <span class="rv-prod-name" title="@p.Name">@p.Name<small>@reviewCount.ToString("N0") yorum</small></span>
+                            <span class="rv-score bad"><i class="zmdi zmdi-star"></i> @avg.ToString("N1")</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <!-- ===== ÖNE ÇIKAN YORUMLAR ===== -->
+    <div class="col-lg-4">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Öne Çıkan Yorumlar</h5>
+                <small>En güncel</small>
+            </div>
+
+            @if (best != null)
+            {
+                int bestRating = best.Rating;
+                <div class="rv-quote good">
+                    <div class="rv-quote-top">
+                        <span class="rv-quote-tag"><i class="zmdi zmdi-mood"></i> En İyi Yorum</span>
+                        <span class="rv-quote-stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="zmdi zmdi-star @(i <= bestRating ? "" : "off")"></i>
+                            }
+                        </span>
+                    </div>
+                    <div class="rv-quote-text" id="BestReviewText" title="@best.Text">“@best.Text”</div>
+                    <div class="rv-quote-foot">
+                        <i class="zmdi zmdi-account"></i> <span id="BestReviewCustomer">@best.Customer</span> ·
+                        <span id="BestReviewProduct">@best.Product</span>
+                    </div>
+                </div>
+            }
+
+            @if (worst != null)
+            {
+                int worstRating = worst.Rating;
+                <div class="rv-quote bad">
+                    <div class="rv-quote-top">
+                        <span class="rv-quote-tag"><i class="zmdi zmdi-mood-bad"></i> En Kötü Yorum</span>
+                        <span class="rv-quote-stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="zmdi zmdi-star @(i <= worstRating ? "" : "off")"></i>
+                            }
+                        </span>
+                    </div>
+                    <div class="rv-quote-text" id="WorstReviewText" title="@worst.Text">“@worst.Text”</div>
+                    <div class="rv-quote-foot">
+                        <i class="zmdi zmdi-account"></i> <span id="WorstReviewCustomer">@worst.Customer</span> ·
+                        <span id="WorstReviewProduct">@worst.Product</span>
+                    </div>
+                </div>
+            }
+
+            @if (best == null && worst == null)
+            {
+                <div class="rv-empty">Henüz yorum yok.</div>
+            }
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,120 @@
+﻿<div class="row dash-row">
+    <div class="col-lg-5">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Kategorilere Göre Ciro</h5>
+                <small>İlk 6</small>
+            </div>
+            <div class="chart-box sm"><canvas id="CategoryChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Ülkelere Göre Sipariş</h5>
+                <small>İlk 6</small>
+            </div>
+            <div class="chart-box sm"><canvas id="CountryChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Ödeme Yöntemleri</h5>
+            </div>
+            <div class="chart-box sm"><canvas id="PaymentChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        // ===== Veriler =====
+        const categoryLabels = @Html.Raw(ViewBag.CategoryName);
+        const categoryValues = @Html.Raw(ViewBag.CategoryRevenue);
+
+        const countryLabels = @Html.Raw(ViewBag.Country);
+        const countryValues = @Html.Raw(ViewBag.CountryOrder);
+
+        const paymentLabels = @Html.Raw(ViewBag.PaymentMethod);
+        const paymentValues = @Html.Raw(ViewBag.PaymentCount);
+
+        // ===== Yardımcılar =====
+        const palette = ['#f96332', '#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#0891b2'];
+        const million = v => '₺' + (v / 1000000).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + 'M';
+
+        // ===== Kategorilere göre ciro (yatay bar) =====
+        new Chart(document.getElementById('CategoryChart'), {
+            type: 'bar',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    label: 'Ciro',
+                    data: categoryValues,
+                    backgroundColor: categoryLabels.map((_, i) => palette[i % palette.length]),
+                    borderRadius: 8,
+                    barThickness: 18
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: c => tl(c.raw) } }
+                },
+                scales: {
+                    x: { ticks: { callback: v => million(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    y: { grid: { display: false }, border: { display: false }, ticks: { font: { weight: '600' } } }
+                }
+            }
+        });
+
+        // ===== Ülkelere göre sipariş (dikey bar) =====
+        new Chart(document.getElementById('CountryChart'), {
+            type: 'bar',
+            data: {
+                labels: countryLabels,
+                datasets: [{
+                    label: 'Sipariş',
+                    data: countryValues,
+                    backgroundColor: 'rgba(59,130,246,.85)',
+                    hoverBackgroundColor: '#2563eb',
+                    borderRadius: 8,
+                    barThickness: 22
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: c => num(c.raw) + ' sipariş' } }
+                },
+                scales: {
+                    y: { ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // ===== Ödeme yöntemleri (donut) =====
+        new Chart(document.getElementById('PaymentChart'), {
+            type: 'doughnut',
+            data: {
+                labels: paymentLabels,
+                datasets: [{
+                    data: paymentValues,
+                    backgroundColor: ['#7c3aed', '#10b981', '#f59e0b', '#0891b2'],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '62%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 8, padding: 12 } },
+                    tooltip: { callbacks: { label: c => c.label + ': ' + num(c.raw) } }
+                }
+            }
+        });
+    })();
+</script>

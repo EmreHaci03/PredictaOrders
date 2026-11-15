@@ -1,0 +1,91 @@
+﻿<div class="row dash-row">
+    <div class="col-lg-8">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Aylık Ciro ve Sipariş</h5>
+                <small>Son 12 ay</small>
+            </div>
+            <div class="chart-box"><canvas id="RevenueChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="dash-card">
+            <div class="dash-card-head">
+                <h5>Sipariş Durumları</h5>
+                <small>Tümü</small>
+            </div>
+            <div class="chart-box"><canvas id="StatusChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        // ===== Aylık ciro + sipariş (veritabanından) =====
+        const monthLabels  = @Html.Raw(ViewBag.MonthlySalesLabels);
+        const monthRevenue = @Html.Raw(ViewBag.MonthlySalesRevenue);
+        const monthOrders  = @Html.Raw(ViewBag.MonthlySalesOrders);
+
+        const million = v => '₺' + (v / 1000000).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + 'M';
+
+        new Chart(document.getElementById('RevenueChart'), {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: [
+                    {
+                        type: 'line', label: 'Ciro', data: monthRevenue, yAxisID: 'y',
+                        borderColor: '#f96332', backgroundColor: 'rgba(249,99,50,.12)',
+                        fill: true, tension: .35, pointRadius: 3, pointBackgroundColor: '#f96332'
+                    },
+                    {
+                        label: 'Sipariş', data: monthOrders, yAxisID: 'y1',
+                        backgroundColor: 'rgba(59,130,246,.25)', borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    tooltip: { callbacks: { label: c => c.dataset.label + ': ' + (c.dataset.yAxisID === 'y' ? tl(c.raw) : num(c.raw)) } }
+                },
+                scales: {
+                    y:  { ticks: { callback: v => million(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: v => num(v) }, border: { display: false } },
+                    x:  { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // ===== Sipariş durumları (veritabanından) =====
+        const statusLabels = @Html.Raw(ViewBag.JsonOrderStatus);
+        const statusValues = @Html.Raw(ViewBag.JsonOrderCount);
+
+        const statusColors = {
+            "Tamamlandı": "#10b981",
+            "Kargoda": "#3b82f6",
+            "Beklemede": "#f59e0b",
+            "İptal Edildi": "#e11d48"
+        };
+
+        new Chart(document.getElementById('StatusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusValues,
+                    backgroundColor: statusLabels.map(x => statusColors[x] || '#9ca3af'),
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '68%',
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: c => c.label + ': ' + num(c.raw) } }
+                }
+            }
+        });
+    })();
+</script>
