@@ -1,0 +1,466 @@
+﻿@{
+    ViewData["Title"] = "Veri Tahminleme";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .fc-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+        .fc-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .fc-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .fc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0,0,0,.05);
+        color: #7c3aed;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .fc-note {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: rgba(245,158,11,.10);
+        color: #92400e;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+
+        .fc-note i {
+            font-size: 18px;
+            margin-top: 1px;
+        }
+
+    .fc-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .fc-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .fc-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .fc-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .fc-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .fc-stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .fc-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .fc-stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .fc-stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #2d2d2d;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .fc-stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 340px;
+    }
+
+        .chart-box.sm {
+            height: 300px;
+        }
+
+    .fc-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .fc-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+            .fc-table th:first-child, .fc-table td:first-child {
+                text-align: left;
+            }
+
+        .fc-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .fc-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .fc-table tfoot td {
+            font-weight: 800;
+            color: #2d2d2d;
+            border-top: 2px solid #f0f1f4;
+            border-bottom: none;
+        }
+
+    .fc-method {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        color: #2d2d2d;
+    }
+
+    .fc-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .fc-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #a3a8b1;
+    }
+
+        .fc-empty i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="fc-hero">
+        <div>
+            <h2>Veri Tahminleme</h2>
+            <p>Ödeme yöntemlerine göre önümüzdeki 12 ayın sipariş tahmini</p>
+        </div>
+        <span class="fc-badge"><i class="zmdi zmdi-memory"></i> ML.NET · SSA Zaman Serisi</span>
+    </div>
+
+    <div class="fc-note">
+        <i class="zmdi zmdi-info-outline"></i>
+        <div>
+            Tahminler <b>2023–2025</b> yıllarına ait sipariş verileriyle eğitilen ML.NET modeliyle üretilmiştir.
+            Model 3 yıllık veriden yıllık mevsimsel düzeni öğrenir; ilk aylardaki tahminler, sonraki aylara göre daha güvenilirdir.
+        </div>
+    </div>
+
+    <div id="ForecastContent">
+
+        <!-- ÖZET KARTLAR -->
+        <div class="row fc-row">
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-orange"><i class="zmdi zmdi-shopping-cart"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Toplam Tahmini Sipariş</div>
+                        <div class="fc-stat-value" id="TotalForecast">-</div>
+                        <div class="fc-stat-sub">önümüzdeki 12 ay</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-purple"><i class="zmdi zmdi-card"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">En Çok Kullanılacak Yöntem</div>
+                        <div class="fc-stat-value" id="TopMethod">-</div>
+                        <div class="fc-stat-sub">toplamın <span id="TopMethodShare">-</span>'i</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-blue"><i class="zmdi zmdi-chart"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Aylık Ortalama</div>
+                        <div class="fc-stat-value" id="MonthlyAverage">-</div>
+                        <div class="fc-stat-sub">sipariş / ay</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-green"><i class="zmdi zmdi-calendar-alt"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">En Yoğun Ay</div>
+                        <div class="fc-stat-value" id="PeakMonth">-</div>
+                        <div class="fc-stat-sub"><span id="PeakMonthValue">-</span> sipariş</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAFİKLER -->
+        <div class="row fc-row">
+            <div class="col-lg-8">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Aylık Sipariş Tahmini</h5>
+                        <small>Ödeme yöntemine göre</small>
+                    </div>
+                    <div class="chart-box"><canvas id="ForecastLineChart"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Yıllık Pay Dağılımı</h5>
+                        <small>12 aylık toplam</small>
+                    </div>
+                    <div class="chart-box"><canvas id="ForecastShareChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLO -->
+        <div class="row fc-row">
+            <div class="col-12">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Ay Ay Tahmin Tablosu</h5>
+                        <small>Sipariş adedi</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="fc-table" id="ForecastTable">
+                            <thead></thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="fc-card fc-empty" id="ForecastEmpty" style="display:none;">
+        <i class="zmdi zmdi-chart-donut"></i>
+        Tahmin yapılacak sipariş verisi bulunamadı.
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+    (function () {
+        // ===== Controller'dan gelen veri =====
+        const monthLabels = @Html.Raw(ViewBag.MonthLabels ?? "[]");
+        const paymentSeries = @Html.Raw(ViewBag.PaymentSeries ?? "[]");
+
+        if (!monthLabels.length || !paymentSeries.length) {
+            document.getElementById('ForecastContent').style.display = 'none';
+            document.getElementById('ForecastEmpty').style.display = 'block';
+            return;
+        }
+
+        // ===== Yardımcılar =====
+        const num = v => Math.round(v).toLocaleString('tr-TR');
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+
+        // Ödeme yöntemlerine sabit renkler, bilinmeyenler için yedek palet
+        const knownColors = {
+            "Kredi Kartı": "#f96332",
+            "Havale": "#3b82f6",
+            "Kapıda Ödeme": "#10b981",
+            "Dijital Cüzdan": "#7c3aed"
+        };
+        const fallback = ['#f59e0b', '#0891b2', '#db2777', '#64748b'];
+        const colorOf = (method, i) => knownColors[method] || fallback[i % fallback.length];
+
+        // ===== Hesaplamalar =====
+        const totals = paymentSeries.map(s => ({ method: s.method, total: sum(s.values) }))
+                                    .sort((a, b) => b.total - a.total);
+        const grandTotal = sum(totals.map(t => t.total));
+        const monthTotals = monthLabels.map((_, i) => sum(paymentSeries.map(s => s.values[i] || 0)));
+        const peakIndex = monthTotals.indexOf(Math.max(...monthTotals));
+
+        // ===== Özet kartlar =====
+        document.getElementById('TotalForecast').textContent = num(grandTotal);
+        document.getElementById('TopMethod').textContent = totals[0].method;
+        document.getElementById('TopMethod').title = totals[0].method;
+        document.getElementById('TopMethodShare').textContent = '%' + (grandTotal > 0 ? (totals[0].total * 100 / grandTotal).toFixed(1) : '0');
+        document.getElementById('MonthlyAverage').textContent = num(grandTotal / monthLabels.length);
+        document.getElementById('PeakMonth').textContent = monthLabels[peakIndex];
+        document.getElementById('PeakMonthValue').textContent = num(monthTotals[peakIndex]);
+
+        // ===== Chart.js ortak ayarlar =====
+        Chart.defaults.color = '#8a8f98';
+        Chart.defaults.font.family = 'inherit';
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+        // ===== Çizgi grafik: her yöntem bir çizgi =====
+        new Chart(document.getElementById('ForecastLineChart'), {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: paymentSeries.map((s, i) => ({
+                    label: s.method,
+                    data: s.values,
+                    borderColor: colorOf(s.method, i),
+                    backgroundColor: colorOf(s.method, i),
+                    borderWidth: 2.5,
+                    tension: .35,
+                    pointRadius: 3,
+                    pointHoverRadius: 6
+                }))
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: c => c.dataset.label + ': ' + num(c.raw) + ' sipariş' } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // ===== Donut: yıllık paylar =====
+        new Chart(document.getElementById('ForecastShareChart'), {
+            type: 'doughnut',
+            data: {
+                labels: totals.map(t => t.method),
+                datasets: [{
+                    data: totals.map(t => t.total),
+                    backgroundColor: totals.map((t, i) => colorOf(t.method, i)),
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '65%',
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: c => c.label + ': ' + num(c.raw) + ' (%' + (grandTotal > 0 ? (c.raw * 100 / grandTotal).toFixed(1) : 0) + ')'
+                        }
+                    }
+                }
+            }
+        });
+
+        // ===== Tablo =====
+        const table = document.getElementById('ForecastTable');
+
+        table.querySelector('thead').innerHTML =
+            '<tr><th>Ödeme Yöntemi</th>' +
+            monthLabels.map(m => `<th>${m}</th>`).join('') +
+            '<th>Toplam</th></tr>';
+
+        table.querySelector('tbody').innerHTML = paymentSeries.map((s, i) =>
+            `<tr>
+                <td><span class="fc-method"><i class="fc-dot" style="background:${colorOf(s.method, i)}"></i>${s.method}</span></td>
+                ${s.values.map(v => `<td>${num(v)}</td>`).join('')}
+                <td><b>${num(sum(s.values))}</b></td>
+            </tr>`
+        ).join('');
+
+        table.querySelector('tfoot').innerHTML =
+            '<tr><td>Toplam</td>' +
+            monthTotals.map(t => `<td>${num(t)}</td>`).join('') +
+            `<td>${num(grandTotal)}</td></tr>`;
+    })();
+</script>

@@ -1,0 +1,477 @@
+﻿@{
+    ViewData["Title"] = "İspanya Şehir Tahmini";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .fc-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+        .fc-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .fc-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .fc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0,0,0,.05);
+        color: #7c3aed;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .fc-note {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: rgba(245,158,11,.10);
+        color: #92400e;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+
+        .fc-note i {
+            font-size: 18px;
+            margin-top: 1px;
+        }
+
+    .fc-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .fc-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .fc-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .fc-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .fc-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .fc-stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .fc-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .fc-stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .fc-stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #2d2d2d;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .fc-stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-amber {
+        background: rgba(245,158,11,.14);
+        color: #d97706;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .i-red {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 340px;
+    }
+
+    .fc-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .fc-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+            .fc-table th:first-child, .fc-table td:first-child {
+                text-align: left;
+            }
+
+        .fc-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .fc-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .fc-table tfoot td {
+            font-weight: 800;
+            color: #2d2d2d;
+            border-top: 2px solid #f0f1f4;
+            border-bottom: none;
+        }
+
+    .fc-city {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        color: #2d2d2d;
+    }
+
+    .fc-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .fc-rank {
+        display: inline-grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        background: #f3f4f7;
+        color: #8a8f98;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .fc-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #a3a8b1;
+    }
+
+        .fc-empty i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="fc-hero">
+        <div>
+            <h2>İspanya Şehir Tahmini</h2>
+            <p>İspanya'da en çok sipariş veren 6 şehrin önümüzdeki 12 aylık sipariş tahmini</p>
+        </div>
+        <span class="fc-badge"><i class="zmdi zmdi-memory"></i> ML.NET · SSA Zaman Serisi</span>
+    </div>
+
+    <div class="fc-note">
+        <i class="zmdi zmdi-info-outline"></i>
+        <div>
+            Tahminler <b>2023–2025</b> yıllarına ait İspanya sipariş verileriyle eğitilen ML.NET modeliyle üretilmiştir.
+            Şehir bazında sipariş sayıları daha düşük olduğu için tahminler ödeme yöntemi tahminine göre daha dalgalı olabilir.
+        </div>
+    </div>
+
+    <div id="ForecastContent">
+
+        <!-- ÖZET KARTLAR -->
+        <div class="row fc-row">
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-amber"><i class="zmdi zmdi-shopping-cart"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Toplam Tahmini Sipariş</div>
+                        <div class="fc-stat-value" id="TotalForecast">-</div>
+                        <div class="fc-stat-sub">6 şehir · 12 ay</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-purple"><i class="zmdi zmdi-city"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">En Çok Sipariş Gelecek Şehir</div>
+                        <div class="fc-stat-value" id="TopCity">-</div>
+                        <div class="fc-stat-sub">toplamın <span id="TopCityShare">-</span>'i</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-red"><i class="zmdi zmdi-chart"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Şehir Başına Ortalama</div>
+                        <div class="fc-stat-value" id="AveragePerCity">-</div>
+                        <div class="fc-stat-sub">sipariş / yıl</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-blue"><i class="zmdi zmdi-calendar-alt"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">En Yoğun Ay</div>
+                        <div class="fc-stat-value" id="PeakMonth">-</div>
+                        <div class="fc-stat-sub"><span id="PeakMonthValue">-</span> sipariş</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAFİKLER -->
+        <div class="row fc-row">
+            <div class="col-lg-8">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Aylık Sipariş Tahmini</h5>
+                        <small>Şehre göre</small>
+                    </div>
+                    <div class="chart-box"><canvas id="CityLineChart"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Yıllık Toplam</h5>
+                        <small>12 aylık tahmin</small>
+                    </div>
+                    <div class="chart-box"><canvas id="CityBarChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLO -->
+        <div class="row fc-row">
+            <div class="col-12">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Ay Ay Tahmin Tablosu</h5>
+                        <small>Sipariş adedi</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="fc-table" id="CityTable">
+                            <thead></thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="fc-card fc-empty" id="ForecastEmpty" style="display:none;">
+        <i class="zmdi zmdi-city-alt"></i>
+        İspanya için tahmin yapılacak sipariş verisi bulunamadı.
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+    (function () {
+        // ===== Controller'dan gelen veri =====
+        const monthLabels = @Html.Raw(ViewBag.MonthLabels ?? "[]");
+        const citySeries = @Html.Raw(ViewBag.Cities ?? "[]");
+
+        if (!monthLabels.length || !citySeries.length) {
+            document.getElementById('ForecastContent').style.display = 'none';
+            document.getElementById('ForecastEmpty').style.display = 'block';
+            return;
+        }
+
+        // ===== Yardımcılar =====
+        const num = v => Math.round(v).toLocaleString('tr-TR');
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+        const palette = ['#f59e0b', '#e11d48', '#3b82f6', '#10b981', '#7c3aed', '#0891b2', '#db2777', '#64748b'];
+
+        // Şehirleri 12 aylık toplama göre büyükten küçüğe sırala
+        citySeries.sort((a, b) => sum(b.values) - sum(a.values));
+        citySeries.forEach((s, i) => s.color = palette[i % palette.length]);
+
+        // ===== Hesaplamalar =====
+        const totals = citySeries.map(s => sum(s.values));
+        const grandTotal = sum(totals);
+        const monthTotals = monthLabels.map((_, i) => sum(citySeries.map(s => s.values[i] || 0)));
+        const peakIndex = monthTotals.indexOf(Math.max(...monthTotals));
+
+        // ===== Özet kartlar =====
+        document.getElementById('TotalForecast').textContent = num(grandTotal);
+
+        document.getElementById('TopCity').textContent = citySeries[0].method;
+        document.getElementById('TopCity').title = citySeries[0].method;
+        document.getElementById('TopCityShare').textContent =
+            '%' + (grandTotal > 0 ? (totals[0] * 100 / grandTotal).toFixed(1) : '0');
+
+        document.getElementById('AveragePerCity').textContent = num(grandTotal / citySeries.length);
+
+        document.getElementById('PeakMonth').textContent = monthLabels[peakIndex];
+        document.getElementById('PeakMonthValue').textContent = num(monthTotals[peakIndex]);
+
+        // ===== Chart.js ortak ayarlar =====
+        Chart.defaults.color = '#8a8f98';
+        Chart.defaults.font.family = 'inherit';
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+        // ===== Çizgi grafik: her şehir bir çizgi =====
+        new Chart(document.getElementById('CityLineChart'), {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: citySeries.map(s => ({
+                    label: s.method,
+                    data: s.values,
+                    borderColor: s.color,
+                    backgroundColor: s.color,
+                    borderWidth: 2.5,
+                    tension: .35,
+                    pointRadius: 3,
+                    pointHoverRadius: 6
+                }))
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: c => c.dataset.label + ': ' + num(c.raw) + ' sipariş' } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // ===== Yatay bar: şehirlerin yıllık toplamı =====
+        new Chart(document.getElementById('CityBarChart'), {
+            type: 'bar',
+            data: {
+                labels: citySeries.map(s => s.method),
+                datasets: [{
+                    label: 'Toplam',
+                    data: totals,
+                    backgroundColor: citySeries.map(s => s.color),
+                    borderRadius: 8,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: c => num(c.raw) + ' sipariş (%' + (grandTotal > 0 ? (c.raw * 100 / grandTotal).toFixed(1) : 0) + ')'
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    y: { grid: { display: false }, border: { display: false }, ticks: { font: { weight: '600' } } }
+                }
+            }
+        });
+
+        // ===== Tablo =====
+        const table = document.getElementById('CityTable');
+
+        table.querySelector('thead').innerHTML =
+            '<tr><th>Şehir</th>' +
+            monthLabels.map(m => `<th>${m}</th>`).join('') +
+            '<th>Toplam</th></tr>';
+
+        table.querySelector('tbody').innerHTML = citySeries.map((s, i) =>
+            `<tr>
+                <td><span class="fc-city"><span class="fc-rank">${i + 1}</span><i class="fc-dot" style="background:${s.color}"></i>${s.method}</span></td>
+                ${s.values.map(v => `<td>${num(v)}</td>`).join('')}
+                <td><b>${num(totals[i])}</b></td>
+            </tr>`
+        ).join('');
+
+        table.querySelector('tfoot').innerHTML =
+            '<tr><td>Toplam</td>' +
+            monthTotals.map(t => `<td>${num(t)}</td>`).join('') +
+            `<td>${num(grandTotal)}</td></tr>`;
+    })();
+</script>
