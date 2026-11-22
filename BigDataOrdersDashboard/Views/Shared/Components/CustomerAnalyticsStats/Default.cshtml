@@ -1,0 +1,128 @@
+﻿<div class="row ca-row">
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-orange"><i class="zmdi zmdi-accounts"></i></div>
+            <div>
+                <div class="stat-label">Müşteri Başına Sipariş</div>
+                <div class="stat-value"><span id="OrdersPerCustomer">@(((double)(ViewBag.OrdersPerCustomer ?? 0.0)).ToString("N1"))</span> sipariş</div>
+                <div class="stat-sub">sipariş vermiş müşteri başına</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-green"><i class="zmdi zmdi-city"></i></div>
+            <div style="min-width:0;">
+                <div class="stat-label">En Kalabalık Şehir</div>
+                <div class="stat-value" id="MostPopulatedCity" style="overflow:hidden; text-overflow:ellipsis;">@(ViewBag.MostPopulatedCity?.City ?? "-")</div>
+                <div class="stat-sub"><span id="MostPopulatedCityCount">@(((int)(ViewBag.MostPopulatedCity?.CustomerCount ?? 0)).ToString("N0"))</span> kayıtlı müşteri</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-purple"><i class="zmdi zmdi-email"></i></div>
+            <div>
+                <div class="stat-label">E-postası Eksik Müşteri</div>
+                <div class="stat-value" id="MissingEmailCustomers">@(((int)(ViewBag.MissingEmailCustomers ?? 0)).ToString("N0"))</div>
+                <div class="stat-sub">iletişime geçilemiyor</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-blue"><i class="zmdi zmdi-truck"></i></div>
+            <div>
+                <div class="stat-label">Kapıda Ödeme Kullanan</div>
+                <div class="stat-value" id="CashOnDeliveryCustomers">@(((int)(ViewBag.CashOnDeliveryCustomers ?? 0)).ToString("N0"))</div>
+                <div class="stat-sub">en az bir kez kapıda ödeyen müşteri</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row ca-row">
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-orange"><i class="zmdi zmdi-account-o"></i></div>
+            <div>
+                <div class="stat-label">Tek Seferlik Müşteri</div>
+                <div class="stat-value" id="OneTimeCustomers">@(((int)(ViewBag.OneTimeCustomers ?? 0)).ToString("N0"))</div>
+                <div class="stat-sub">sadece 1 sipariş verip gelmeyen</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-green"><i class="zmdi zmdi-account-add"></i></div>
+            <div>
+                <div class="stat-label">2025'te Kazanılan Müşteri</div>
+                <div class="stat-value" id="AcquiredIn2025">@(((int)(ViewBag.acquiredIn2025 ?? 0)).ToString("N0"))</div>
+                <div class="stat-sub">ilk siparişi 2025'te</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-purple"><i class="zmdi zmdi-card"></i></div>
+            <div>
+                <div class="stat-label">Çoklu Ödeme Kullanan</div>
+                <div class="stat-value" id="MultiPaymentCustomers">@(((int)(ViewBag.multiPaymentCustomers ?? 0)).ToString("N0"))</div>
+                <div class="stat-sub">3+ farklı ödeme yöntemi denemiş</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-blue"><i class="zmdi zmdi-shopping-basket"></i></div>
+            <div style="min-width:0;">
+                <div class="stat-label">En Çok Ürün Alan</div>
+                <div class="stat-value" id="TopQuantityCustomer" style="font-size:18px; overflow:hidden; text-overflow:ellipsis;">@(ViewBag.TopQuantityCustomer?.NameSurname ?? "-")</div>
+                <div class="stat-sub"><span id="TopQuantityCustomerTotal">@(((int)(ViewBag.TopQuantityCustomer?.Sum ?? 0)).ToString("N0"))</span> adet ürün</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row ca-row">
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-orange"><i class="zmdi zmdi-close-circle"></i></div>
+            <div style="min-width:0;">
+                <div class="stat-label">En Çok İptal Eden Müşteri</div>
+                <div class="stat-value" id="TopCancellingCustomer" style="font-size:18px; overflow:hidden; text-overflow:ellipsis;">@(ViewBag.TopCancellingCustomer?.NameSurname ?? "-")</div>
+                <div class="stat-sub"><span id="TopCancellingCount">@(((int)(ViewBag.TopCancellingCustomer?.Count ?? 0)).ToString("N0"))</span> siparişi iptal edilmiş</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-green"><i class="zmdi zmdi-explore"></i></div>
+            <div style="min-width:0;">
+                <div class="stat-label">En Meraklı Müşteri</div>
+                <div class="stat-value" id="MostCuriousCustomer" style="font-size:18px; overflow:hidden; text-overflow:ellipsis;">@(ViewBag.MostCuriousCustomer?.NameSurname ?? "-")</div>
+                <div class="stat-sub"><span id="MostCuriousCustomerCount">@(((int)(ViewBag.MostCuriousCustomer?.ProductCount ?? 0)).ToString("N0"))</span> farklı ürün denemiş</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-purple"><i class="zmdi zmdi-money-box"></i></div>
+            <div style="min-width:0;">
+                <div class="stat-label">Uzaklaşan En Değerli Müşteri</div>
+                <div class="stat-value" id="DriftingTopCustomer" style="font-size:18px; overflow:hidden; text-overflow:ellipsis;">@(ViewBag.DriftingTopCustomer?.NameSurname ?? "-")</div>
+                <div class="stat-sub">₺<span id="DriftingTopCustomerValue">@(((decimal)(ViewBag.DriftingTopCustomer?.TotalSpent ?? 0m)).ToString("N0"))</span> · <span id="DriftingTopCustomerDays">@(ViewBag.DriftingTopCustomer?.DaysAway ?? 0)</span> gündür yok</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="ca-card stat">
+            <div class="stat-icon i-blue"><i class="zmdi zmdi-calendar-check"></i></div>
+            <div>
+                <div class="stat-label">Son 1 Haftanın Müşterisi</div>
+                <div class="stat-value" id="LastWeekCustomers">@(((int)(ViewBag.LastWeekCustomers ?? 0)).ToString("N0"))</div>
+                <div class="stat-sub">son 7 günde alışveriş yapan</div>
+            </div>
+        </div>
+    </div>
+</div>

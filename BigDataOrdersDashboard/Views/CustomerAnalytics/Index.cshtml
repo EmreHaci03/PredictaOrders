@@ -1,0 +1,222 @@
+﻿@{
+    ViewData["Title"] = "Müşteri Analitiği";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .ca-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .ca-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .ca-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .ca-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0,0,0,.05);
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .ca-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .ca-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .ca-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .ca-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .ca-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        margin: 6px 0 14px;
+    }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eceef2;
+        }
+
+    /* İstatistik kartları */
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+    }
+
+    .stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 300px;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- BAŞLIK -->
+    <div class="ca-hero">
+        <div>
+            <h2>Müşteri Analitiği</h2>
+            <p>Müşteri davranışları ve sipariş istatistikleri</p>
+        </div>
+        <span class="ca-pill"><i class="zmdi zmdi-time"></i> Referans tarihi: <b id="ReferenceDate">@DateTime.Now.ToString("dd MMM yyyy")</b></span>
+    </div>
+
+    <!-- İSTATİSTİK KARTLARI -->
+    @await Component.InvokeAsync("CustomerAnalyticsStats")
+
+    <!-- ŞEHİRLER -->
+    <div class="section-title"><i class="zmdi zmdi-city"></i> Şehirler</div>
+    <div class="row ca-row">
+        <div class="col-12">
+            <div class="ca-card">
+                <div class="ca-card-head">
+                    <h5>En Çok Sipariş Veren Müşteri Şehirleri</h5>
+                    <small>İlk 10 şehir</small>
+                </div>
+                <div class="chart-box" style="height:360px;"><canvas id="TopCitiesChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+    (function () {
+        const cityNames = @Html.Raw(ViewBag.TopCustomerCityName);
+        const cityCounts = @Html.Raw(ViewBag.TopCustomerCityCount);
+
+        const num = v => Number(v).toLocaleString('tr-TR');
+        Chart.defaults.color = '#8a8f98';
+        Chart.defaults.font.family = 'inherit';
+
+        new Chart(document.getElementById('TopCitiesChart'), {
+            type: 'bar',
+            data: {
+                labels: cityNames,
+                datasets: [{
+                    label: 'Sipariş',
+                    data: cityCounts,
+                    backgroundColor: cityCounts.map((c, i) => i === 0 ? '#f96332' : 'rgba(249,99,50,.35)'),
+                    borderRadius: 6,
+                    barThickness: 22
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: c => num(c.raw) + ' sipariş' } }
+                },
+                scales: {
+                    x: { ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    y: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+    })();
+</script>

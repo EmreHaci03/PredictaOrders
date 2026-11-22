@@ -19,7 +19,7 @@
             <li><a href="/AdminProduct/Index/"><i class="zmdi zmdi-shopping-basket"></i><span>Ürünler</span></a></li>
             <li><a href="/AdminCustomer/Index/"><i class="zmdi zmdi-accounts"></i><span>Müşteriler</span></a></li>
             <li><a href="/AdminOrder/Index"><i class="zmdi zmdi-shopping-cart"></i><span>Siparişler</span></a></li>
-            <li><a href="/AdminReview/Index"><i class="zmdi zmdi-comment-text"></i><span>Yorumlar</span></a></li>
+            <li><a href="/AdminReview/Index"><i class="zmdi zmdi-star"></i><span>Değerlendirmeler</span></a></li>
 
             <li class="header">ANALİZ</li>
             <li>
@@ -29,16 +29,23 @@
                     <li><a href="/AdminStatistic/TextualStatistics">Metinsel İstatistikler</a></li>
                 </ul>
             </li>
+            <li>
+                <a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-accounts-alt"></i><span>Müşteri Analizi</span></a>
+                <ul class="ml-menu">
+                    <li><a href="/CustomerAnalytics/Index">Müşteri Analitiği</a></li>
+                    <li><a href="/AdminCustomerSegmentation/CityCustomerLoyalty">Müşteri Segmentasyonu</a></li>
+                    <li><a href="/AdminCustomerSegmentation/CityCustomerLoyaltyMl">ML.NET İle Müşteri Segmentasyonu</a></li>
+                    <li><a href="/AdminCustomerSegmentation/CustomerRetention">Elde Tutma ve Churn</a></li> @*yapılmadı*@
+
+                </ul>
+            </li>
+
             <li class="header">YAPAY ZEKÂ</li>
             <li>
                 <a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-trending-up"></i><span>Veri Tahminleme</span></a>
                 <ul class="ml-menu">
-                    <li><a href="/Forecast/Index">Ödeme Yöntemi Tahmini</a></li>
-                    <li><a href="/Forecast/GermanyCityForecast">Almanya Şehir Tahmini</a></li>
-                    <li><a href="/Forecast/TurkeyCityForecast">Türkiye Şehir Tahmini</a></li>
-                    <li><a href="/Forecast/SpainCityForecast">İspanya Şehir Tahmini</a></li>
-                    <li><a href="/Forecast/PolandCityForecast">Polonya Şehir Tahmini</a></li>
-
+                    <li><a href="/AdminForecast/PaymentMethodForecast">Ödeme Yöntemi Tahmini</a></li>
+                    <li><a href="/AdminForecast/CityForecast">Şehir Tahminleri</a></li>
                 </ul>
             </li>
         </ul>

@@ -1,0 +1,456 @@
+﻿@model List<LoyaltyScoreDto>
+@{
+    ViewData["Title"] = "Müşteri Sadakati";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var country = ViewBag.Country as string;
+    var countries = ViewBag.Countries as List<string> ?? new List<string>();
+    bool hasCountry = !string.IsNullOrEmpty(country);
+
+    var list = Model ?? new List<LoyaltyScoreDto>();
+
+    int customerCount = list.Count;
+    int avgScore = customerCount > 0 ? (int)list.Average(x => x.LoyaltyScore) : 0;
+    int veryLoyal = list.Count(x => x.LoyaltyLevel == "Çok Sadık");
+    int loyal = list.Count(x => x.LoyaltyLevel == "Sadık");
+    int undecided = list.Count(x => x.LoyaltyLevel == "Kararsız");
+    int leaving = list.Count(x => x.LoyaltyLevel == "Kaybolmak Üzere");
+
+    string Rate(int count) => customerCount > 0
+        ? (count * 100.0 / customerCount).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)
+        : "0";
+}
+
+<style>
+    .ly-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .ly-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .ly-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .ly-filter {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        padding: 8px 8px 8px 16px;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(0,0,0,.05);
+    }
+
+        .ly-filter label {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        .ly-filter select {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 8px 12px;
+            min-width: 200px;
+            outline: none;
+            color: #2d2d2d;
+            font-weight: 600;
+            background: #fff;
+        }
+
+            .ly-filter select:focus {
+                border-color: #f96332;
+            }
+
+    .ly-empty {
+        text-align: center;
+        padding: 70px 20px;
+        color: #8a8f98;
+    }
+
+        .ly-empty i {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 14px;
+            color: #c4c8d0;
+        }
+
+        .ly-empty h5 {
+            font-weight: 800;
+            color: #2d2d2d;
+            margin-bottom: 6px;
+        }
+
+    .ly-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .ly-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .ly-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .ly-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .ly-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .i-red {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .lvl {
+        margin-bottom: 16px;
+    }
+
+    .lvl-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 700;
+        color: #4b5563;
+        margin-bottom: 6px;
+    }
+
+    .lvl-bar {
+        height: 8px;
+        border-radius: 999px;
+        background: #f0f1f4;
+        overflow: hidden;
+    }
+
+        .lvl-bar div {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+    .ly-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .ly-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .ly-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .ly-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .ly-table .num {
+            text-align: right;
+        }
+
+        .ly-table .strong {
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+    .tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .tag-1 {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .tag-2 {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .tag-3 {
+        background: rgba(245,158,11,.14);
+        color: #d97706;
+    }
+
+    .tag-4 {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .score {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .score-bar {
+        width: 70px;
+        height: 6px;
+        border-radius: 999px;
+        background: #f0f1f4;
+        overflow: hidden;
+    }
+
+        .score-bar div {
+            height: 100%;
+            background: #f96332;
+            border-radius: 999px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <!-- BAŞLIK + ÜLKE SEÇİMİ -->
+    <div class="ly-hero">
+        <div>
+            <h2>@(hasCountry ? country + " Müşteri Sadakati" : "Müşteri Sadakati")</h2>
+            <p>Son sipariş, sipariş sayısı ve harcamaya göre sadakat skorları</p>
+        </div>
+
+        <form method="get" action="/AdminCustomerSegmentation/CityCustomerLoyalty" class="ly-filter">
+            <label for="CountrySelect"><i class="zmdi zmdi-globe"></i> Ülke</label>
+            <select id="CountrySelect" name="Country" onchange="this.form.submit()">
+                <option value="">Ülke seçin…</option>
+                @foreach (var c in countries)
+                {
+                    <option value="@c" selected="@(c == country)">@c</option>
+                }
+            </select>
+        </form>
+    </div>
+
+    @if (!hasCountry)
+    {
+        <!-- ÜLKE SEÇİLMEDİ -->
+        <div class="ly-card ly-empty">
+            <i class="zmdi zmdi-pin"></i>
+            <h5>Bir ülke seçin</h5>
+            Sadakat skorlarını görmek için sağ üstten bir ülke seçin.
+        </div>
+    }
+    else if (customerCount == 0)
+    {
+        <!-- VERİ YOK -->
+        <div class="ly-card ly-empty">
+            <i class="zmdi zmdi-info-outline"></i>
+            <h5>Veri bulunamadı</h5>
+            <b>@country</b> için müşteri sipariş verisi yok.
+        </div>
+    }
+    else
+    {
+        <!-- KPI KARTLARI -->
+        <div class="row ly-row">
+            <div class="col-lg-3 col-md-6">
+                <div class="ly-card stat">
+                    <div class="stat-icon i-blue"><i class="zmdi zmdi-accounts"></i></div>
+                    <div>
+                        <div class="stat-label">Toplam Müşteri</div>
+                        <div class="stat-value">@customerCount.ToString("N0")</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="ly-card stat">
+                    <div class="stat-icon i-orange"><i class="zmdi zmdi-star"></i></div>
+                    <div>
+                        <div class="stat-label">Ortalama Skor</div>
+                        <div class="stat-value">@avgScore <small style="font-size:14px; color:#8a8f98;">/ 100</small></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="ly-card stat">
+                    <div class="stat-icon i-green"><i class="zmdi zmdi-favorite"></i></div>
+                    <div>
+                        <div class="stat-label">Çok Sadık</div>
+                        <div class="stat-value">@veryLoyal.ToString("N0")</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="ly-card stat">
+                    <div class="stat-icon i-red"><i class="zmdi zmdi-run"></i></div>
+                    <div>
+                        <div class="stat-label">Kaybolmak Üzere</div>
+                        <div class="stat-value">@leaving.ToString("N0")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row ly-row">
+            <!-- SEVİYE DAĞILIMI -->
+            <div class="col-lg-4">
+                <div class="ly-card">
+                    <div class="ly-card-head">
+                        <h5>Sadakat Seviyeleri</h5>
+                        <small>Müşteri oranı</small>
+                    </div>
+
+                    <div class="lvl">
+                        <div class="lvl-top"><span>Çok Sadık</span><span>@veryLoyal · %@Rate(veryLoyal)</span></div>
+                        <div class="lvl-bar"><div style="width:@Rate(veryLoyal)%; background:#10b981;"></div></div>
+                    </div>
+                    <div class="lvl">
+                        <div class="lvl-top"><span>Sadık</span><span>@loyal · %@Rate(loyal)</span></div>
+                        <div class="lvl-bar"><div style="width:@Rate(loyal)%; background:#3b82f6;"></div></div>
+                    </div>
+                    <div class="lvl">
+                        <div class="lvl-top"><span>Kararsız</span><span>@undecided · %@Rate(undecided)</span></div>
+                        <div class="lvl-bar"><div style="width:@Rate(undecided)%; background:#f59e0b;"></div></div>
+                    </div>
+                    <div class="lvl">
+                        <div class="lvl-top"><span>Kaybolmak Üzere</span><span>@leaving · %@Rate(leaving)</span></div>
+                        <div class="lvl-bar"><div style="width:@Rate(leaving)%; background:#e11d48;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÜŞTERİ TABLOSU -->
+            <div class="col-lg-8">
+                <div class="ly-card">
+                    <div class="ly-card-head">
+                        <h5>Müşteri Sadakat Skorları</h5>
+                        <small>Skora göre sıralı</small>
+                    </div>
+                    <div class="table-responsive" style="max-height:520px; overflow-y:auto;">
+                        <table class="ly-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Müşteri</th>
+                                    <th class="num">Sipariş</th>
+                                    <th class="num">Harcama</th>
+                                    <th class="num">Son Sipariş</th>
+                                    <th>Seviye</th>
+                                    <th class="num">Skor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ int i = 1; }
+                                @foreach (var c in list)
+                                {
+                                    string tagClass = c.LoyaltyLevel switch
+                                    {
+                                        "Çok Sadık" => "tag-1",
+                                        "Sadık" => "tag-2",
+                                        "Kararsız" => "tag-3",
+                                        _ => "tag-4"
+                                    };
+
+                                    <tr>
+                                        <td>@i</td>
+                                        <td class="strong">@c.CustomerName</td>
+                                        <td class="num">@c.OrderCount</td>
+                                        <td class="num strong">₺@c.TotalSpend.ToString("N0")</td>
+                                        <td class="num">@c.DaysSinceLastOrder gün önce</td>
+                                        <td><span class="tag @tagClass">@c.LoyaltyLevel</span></td>
+                                        <td class="num">
+                                            <div class="score">
+                                                <div class="score-bar"><div style="width:@(c.LoyaltyScore)%"></div></div>
+                                                <b>@c.LoyaltyScore</b>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

@@ -1,0 +1,347 @@
+﻿@{
+    ViewData["Title"] = "Elde Tutma ve Churn";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    int customers2024 = ViewBag.Customers2024 ?? 0;
+    int retained = ViewBag.RetainedCustomers ?? 0;
+    double retentionRate = ViewBag.RetentionRate ?? 0.0;
+
+    int totalCustomers = ViewBag.TotalCustomers ?? 0;
+    int churned = ViewBag.ChurnedCustomers ?? 0;
+    double churnRate = ViewBag.ChurnRate ?? 0.0;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int pageSize = ViewBag.PageSize ?? 20;
+
+    var inv = System.Globalization.CultureInfo.InvariantCulture;
+}
+
+<style>
+    .rt-hero {
+        margin-bottom: 24px;
+    }
+
+        .rt-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .rt-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .rt-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .rt-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .rt-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .rt-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .rt-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+    }
+
+    .stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .i-red {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .big-rate {
+        font-size: 44px;
+        font-weight: 800;
+        letter-spacing: -.03em;
+    }
+
+    .rate-bar {
+        height: 12px;
+        border-radius: 999px;
+        background: #f0f1f4;
+        overflow: hidden;
+        margin: 14px 0 10px;
+    }
+
+        .rate-bar div {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+    .rate-desc {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    .rt-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .rt-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .rt-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .rt-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .rt-table .num {
+            text-align: right;
+        }
+
+        .rt-table .strong {
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+    .days {
+        color: #e11d48;
+        font-weight: 700;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="rt-hero">
+        <h2>Elde Tutma ve Churn</h2>
+        <p>Müşterilerin ne kadarı kalıyor, ne kadarı gidiyor</p>
+    </div>
+
+    <!-- KPI KARTLARI -->
+    <div class="row rt-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="rt-card stat">
+                <div class="stat-icon i-blue"><i class="zmdi zmdi-accounts"></i></div>
+                <div>
+                    <div class="stat-label">2024 Müşterisi</div>
+                    <div class="stat-value">@customers2024.ToString("N0")</div>
+                    <div class="stat-sub">2024'te sipariş veren</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="rt-card stat">
+                <div class="stat-icon i-green"><i class="zmdi zmdi-check-circle"></i></div>
+                <div>
+                    <div class="stat-label">2025'te de Gelen</div>
+                    <div class="stat-value">@retained.ToString("N0")</div>
+                    <div class="stat-sub">elde tutulan müşteri</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="rt-card stat">
+                <div class="stat-icon i-orange"><i class="zmdi zmdi-accounts-alt"></i></div>
+                <div>
+                    <div class="stat-label">Toplam Müşteri</div>
+                    <div class="stat-value">@totalCustomers.ToString("N0")</div>
+                    <div class="stat-sub">en az 1 siparişi olan</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="rt-card stat">
+                <div class="stat-icon i-red"><i class="zmdi zmdi-run"></i></div>
+                <div>
+                    <div class="stat-label">Giden Müşteri</div>
+                    <div class="stat-value">@churned.ToString("N0")</div>
+                    <div class="stat-sub">180+ gündür sipariş yok</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORANLAR -->
+    <div class="row rt-row">
+        <div class="col-lg-6">
+            <div class="rt-card">
+                <div class="rt-card-head">
+                    <h5>Elde Tutma Oranı (Retention)</h5>
+                    <small>2024 → 2025</small>
+                </div>
+                <div class="big-rate" style="color:#059669;">%@retentionRate.ToString("0.0")</div>
+                <div class="rate-bar"><div style="width:@retentionRate.ToString("0.0", inv)%; background:#10b981;"></div></div>
+                <div class="rate-desc">
+                    2024'te alışveriş yapan <b>@customers2024.ToString("N0")</b> müşteriden
+                    <b>@retained.ToString("N0")</b> tanesi 2025'te de geldi.
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="rt-card">
+                <div class="rt-card-head">
+                    <h5>Kayıp Oranı (Churn)</h5>
+                    <small>Son 180 gün</small>
+                </div>
+                <div class="big-rate" style="color:#e11d48;">%@churnRate.ToString("0.0")</div>
+                <div class="rate-bar"><div style="width:@churnRate.ToString("0.0", inv)%; background:#e11d48;"></div></div>
+                <div class="rate-desc">
+                    Toplam <b>@totalCustomers.ToString("N0")</b> müşteriden
+                    <b>@churned.ToString("N0")</b> tanesi 180 günden uzun süredir sipariş vermiyor.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHURN LİSTESİ -->
+    <!-- CHURN LİSTESİ -->
+    <div class="row rt-row">
+        <div class="col-12">
+            <div class="rt-card">
+                <div class="rt-card-head">
+                    <h5>Giden Müşteriler</h5>
+                    <small>Toplam @churned.ToString("N0") müşteri · Sayfa @currentPage / @(totalPages == 0 ? 1 : totalPages)</small>
+                </div>
+
+                @if (ViewBag.ChurnedList == null || ((IEnumerable<dynamic>)ViewBag.ChurnedList).Count() == 0)
+                {
+                    <div style="text-align:center; padding:30px; color:#8a8f98;">
+                        180 günden uzun süredir gelmeyen müşteri yok.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="rt-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Müşteri</th>
+                                    <th>Ülke</th>
+                                    <th class="num">Sipariş</th>
+                                    <th class="num">Son Siparişten Beri</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ int i = (currentPage - 1) * pageSize + 1; }
+                                @foreach (var c in ViewBag.ChurnedList)
+                                {
+                                    <tr>
+                                        <td>@i</td>
+                                        <td class="strong">@c.NameSurname</td>
+                                        <td>@c.Country</td>
+                                        <td class="num">@c.OrderCount</td>
+                                        <td class="num days">@c.DaysAway gün</td>
+                                    </tr>
+                                    i++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (totalPages > 1)
+                    {
+                        <nav style="margin-top:18px;">
+                            <ul class="pagination justify-content-center" style="margin:0;">
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="?page=@(currentPage - 1)">‹</a>
+                                </li>
+
+                                @for (int p = Math.Max(1, currentPage - 2); p <= Math.Min(totalPages, currentPage + 2); p++)
+                                {
+                                    <li class="page-item @(p == currentPage ? "active" : "")">
+                                        <a class="page-link" href="?page=@p">@p</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <a class="page-link" href="?page=@(currentPage + 1)">›</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
