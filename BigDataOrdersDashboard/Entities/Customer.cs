@@ -14,5 +14,6 @@
         public string CustomerAddress { get; set; }
         public List<Order> Orders { get; set; }
         public List<Review> Reviews { get; set; }
+        public List<Message> Messages { get; set; }
     }
 }
