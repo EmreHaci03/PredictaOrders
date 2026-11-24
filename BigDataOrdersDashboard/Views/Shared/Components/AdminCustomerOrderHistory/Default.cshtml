@@ -1,0 +1,110 @@
+﻿<div class="row cd-row">
+    <div class="col-lg-8">
+        <div class="cd-card">
+            <div class="cd-card-head">
+                <h5>Son Siparişler</h5>
+                <small>Son 8 sipariş</small>
+            </div>
+            <div class="table-responsive">
+                <table class="cd-table" id="RecentOrdersTable">
+                    <thead>
+                        <tr>
+                            <th>Sipariş</th>
+                            <th>Ürün</th>
+                            <th class="num">Adet</th>
+                            <th class="num">Tutar</th>
+                            <th>Ödeme</th>
+                            <th>Durum</th>
+                            <th class="num">Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in ViewBag.Last8Orders)
+                        {
+                            <tr>
+                                <td class="strong">#@order.OrderId</td>
+
+                                <td>@order.Product</td>
+
+                                <td class="num">@order.Quantity</td>
+
+                                <td class="num strong">
+                                    @order.Amount.ToString("N2") ₺
+                                </td>
+
+                                <td>@order.PaymentMethod</td>
+
+                                <td>
+                                    @if (order.Status == "Kargoda")
+                                    {
+                                        <span class="status st-ship">Kargoda</span>
+                                    }
+                                    else if (order.Status == "Tamamlandı")
+                                    {
+                                        <span class="status st-done">Teslim Edildi</span>
+                                    }
+                                    else if (order.Status == "İptal Edildi")
+                                    {
+                                        <span class="status st-cancel">İptal Edildi</span>
+                                    }
+                                    else if (order.Status == "Hazırlanıyor")
+                                    {
+                                        <span class="status st-wait">Hazırlanıyor</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status st-wait">@order.Status</span>
+                                    }
+                                </td>
+
+                                <td class="num">
+                                    @order.OrderDate.ToString("dd MMM yyyy")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="cd-card">
+            <div class="cd-card-head">
+                <h5>Değerlendirmeleri</h5>
+                <small>
+                    Son 8 değerlendirme
+                </small>
+            </div>
+
+            <div id="CustomerReviews">
+                @foreach (var review in ViewBag.Last8OrderReviews)
+                {
+                    <div class="review">
+                        <div class="review-top">
+                            <b>@review.Product</b>
+
+                            <span class="stars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= review.Rating)
+                                    {
+                                        <text>★</text>
+                                    }
+                                    else
+                                    {
+                                        <span class="off">★</span>
+                                    }
+                                }
+                            </span>
+                        </div>
+
+                        <p>@review.ReviewText</p>
+
+                        <small>@review.Date.ToString("dd MMM yyyy")</small>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

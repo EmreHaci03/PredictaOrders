@@ -1,0 +1,672 @@
+﻿@model Customer
+@{
+    ViewData["Title"] = "Müşteri Detayı";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .cd-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8a8f98;
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 16px;
+        text-decoration: none;
+    }
+
+        .cd-back:hover {
+            color: #f96332;
+            text-decoration: none;
+        }
+
+    .cd-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .cd-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .cd-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .cd-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .cd-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    /* ===== Profil ===== */
+    .cd-profile {
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        margin-bottom: 20px;
+    }
+
+    .cd-cover {
+        height: 110px;
+        background: linear-gradient(120deg, #f96332 0%, #ff8a5c 45%, #7c3aed 100%);
+    }
+
+    .cd-profile-body {
+        display: flex;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 0 26px 22px;
+        margin-top: -46px;
+    }
+
+    .cd-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 24px;
+        background: #fff;
+        padding: 5px;
+        box-shadow: 0 6px 20px rgba(0,0,0,.10);
+        flex-shrink: 0;
+    }
+
+        .cd-avatar span {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            display: grid;
+            place-items: center;
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #f96332, #f59e0b);
+        }
+
+    .cd-info {
+        flex: 1;
+        min-width: 220px;
+    }
+
+        .cd-info h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #2d2d2d;
+            margin: 0 0 6px;
+        }
+
+    .cd-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .cd-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    .cd-level {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(16,185,129,.12);
+        color: #059669;
+        font-weight: 800;
+        font-size: 13px;
+    }
+
+    /* ===== KPI ===== */
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #2d2d2d;
+        white-space: nowrap;
+    }
+
+    .stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    /* ===== Sadakat ===== */
+    .score-ring {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 4px auto 18px;
+    }
+
+        .score-ring canvas {
+            position: absolute;
+            inset: 0;
+        }
+
+    .score-center {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+    }
+
+        .score-center b {
+            display: block;
+            font-size: 36px;
+            font-weight: 800;
+            color: #2d2d2d;
+            line-height: 1;
+        }
+
+        .score-center small {
+            color: #a3a8b1;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+    .rfm {
+        margin-bottom: 14px;
+    }
+
+    .rfm-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 700;
+        color: #4b5563;
+        margin-bottom: 6px;
+    }
+
+        .rfm-top small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .rfm-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+        .rfm-dots i {
+            flex: 1;
+            height: 8px;
+            border-radius: 999px;
+            background: #f0f1f4;
+        }
+
+            .rfm-dots i.on {
+                background: var(--c);
+            }
+
+    .chart-box {
+        position: relative;
+        height: 280px;
+    }
+
+    /* ===== Listeler ===== */
+    .fav-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .fav-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px solid #f6f7f9;
+        }
+
+            .fav-list li:last-child {
+                border-bottom: none;
+            }
+
+    .fav-rank {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 12px;
+        background: #f3f4f7;
+        color: #8a8f98;
+        flex-shrink: 0;
+    }
+
+    .fav-list li:first-child .fav-rank {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .fav-name {
+        flex: 1;
+        min-width: 0;
+        font-weight: 700;
+        color: #2d2d2d;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .fav-name small {
+            display: block;
+            color: #a3a8b1;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+    .fav-value {
+        text-align: right;
+        font-weight: 800;
+        color: #2d2d2d;
+        white-space: nowrap;
+    }
+
+        .fav-value small {
+            display: block;
+            color: #a3a8b1;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+    /* ===== Tablo ===== */
+    .cd-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .cd-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .cd-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .cd-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .cd-table .num {
+            text-align: right;
+        }
+
+        .cd-table .strong {
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+    .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .st-done {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .st-ship {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .st-wait {
+        background: rgba(245,158,11,.14);
+        color: #d97706;
+    }
+
+    .st-cancel {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    /* ===== Değerlendirmeler ===== */
+    .review {
+        padding: 14px 0;
+        border-bottom: 1px solid #f6f7f9;
+    }
+
+        .review:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+    .review-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+        .review-top b {
+            color: #2d2d2d;
+            font-size: 14px;
+        }
+
+    .stars {
+        color: #f59e0b;
+        font-size: 13px;
+        letter-spacing: 1px;
+    }
+
+        .stars .off {
+            color: #e5e7eb;
+        }
+
+    .review p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .review small {
+        color: #a3a8b1;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    .cd-ai-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        color: #fff !important;
+        font-weight: 800;
+        font-size: 13px;
+        box-shadow: 0 6px 16px rgba(124,58,237,.28);
+        transition: transform .15s;
+    }
+
+        .cd-ai-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <a href="/AdminCustomer/Index" class="cd-back"><i class="zmdi zmdi-arrow-left"></i> Müşterilere dön</a>
+
+    <!-- ===== PROFİL ===== -->
+    <div class="cd-profile">
+        <div class="cd-cover"></div>
+        <div class="cd-profile-body">
+            <div class="cd-avatar">
+                <span>@(Model.CustomerName?.Substring(0, 1))@(Model.CustomerSurname?.Substring(0, 1))</span>
+            </div>
+            <div class="cd-info">
+                <h2>@Model.CustomerName @Model.CustomerSurname</h2>
+                <div class="cd-meta">
+                    <span><i class="zmdi zmdi-email"></i> @Model.CustomerEmail</span>
+                    <span><i class="zmdi zmdi-phone"></i> @Model.CustomerPhone</span>
+                    <span><i class="zmdi zmdi-pin"></i> @Model.CustomerCity / @Model.CustomerDistrict, @Model.CustomerCountry</span>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <span class="cd-level" style="background:rgba(124,58,237,.10); color:#7c3aed;">
+                    <i class="zmdi zmdi-account"></i> Müşteri No #@Model.CustomerId
+                </span>
+                <a href="/AdminCustomer/AiCustomerAnalysis?customerId=@Model.CustomerId" class="cd-ai-btn">
+                    <i class="zmdi zmdi-flash"></i> AI ile Analiz Et
+                </a>
+                <a href="/AdminCustomer/AiReviewAnalysis?customerId=@Model.CustomerId" class="cd-ai-btn">
+                    <i class="zmdi zmdi-flash"></i> AI ile Müşteri Yorumlarını Analiz Et
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== KPI KARTLARI ===== -->
+    @await Component.InvokeAsync("AdminCustomerKpiCards", new { customerId = Model.CustomerId })
+
+    <!-- ===== SADAKAT + AYLIK SİPARİŞ ===== -->
+    <div class="row cd-row">
+        <div class="col-lg-4">
+            <div class="cd-card">
+                <div class="cd-card-head">
+                    <h5>Sadakat Skoru</h5>
+                    <small>@Model.CustomerCountry müşterilerine göre</small>
+                </div>
+
+                @if (ViewBag.HasLoyalty == true)
+                {
+                    int r = ViewBag.R;
+                    int f = ViewBag.F;
+                    int m = ViewBag.M;
+
+                    <div class="score-ring">
+                        <canvas id="ScoreRing"></canvas>
+                        <div class="score-center">
+                            <div><b>@ViewBag.LoyaltyScore</b><small>/ 100</small></div>
+                        </div>
+                    </div>
+
+                    <div class="rfm" style="--c:#f96332;">
+                        <div class="rfm-top"><span>Yakınlık (R)</span><small>@ViewBag.Days gün önce</small></div>
+                        <div class="rfm-dots">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= r ? "on" : "")"></i>
+                            }
+                        </div>
+                    </div>
+                    <div class="rfm" style="--c:#3b82f6;">
+                        <div class="rfm-top"><span>Sıklık (F)</span><small>@ViewBag.OrderCount sipariş</small></div>
+                        <div class="rfm-dots">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= f ? "on" : "")"></i>
+                            }
+                        </div>
+                    </div>
+                    <div class="rfm" style="--c:#10b981;">
+                        <div class="rfm-top"><span>Harcama (M)</span><small>₺@(((decimal)ViewBag.TotalSpend).ToString("N0"))</small></div>
+                        <div class="rfm-dots">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= m ? "on" : "")"></i>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div style="text-align:center; padding:30px; color:#8a8f98;">
+                        Bu müşterinin siparişi olmadığı için skor hesaplanamadı.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="cd-card">
+                <div class="cd-card-head">
+                    <h5>Aylık Sipariş ve Harcama</h5>
+                    <small>Son 12 ay</small>
+                </div>
+                <div class="chart-box"><canvas id="MonthlyChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FAVORİLER + ÖDEME ===== -->
+    @await Component.InvokeAsync("AdminCustomerPurchaseInsights", new { customerId = Model.CustomerId })
+
+    @await Component.InvokeAsync("AdminCustomerOrderHistory", new { customerId = Model.CustomerId })
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+   
+    (function () {
+        const loyaltyScore = @(ViewBag.LoyaltyScore ?? 0);
+
+        const monthLabels = @Html.Raw(ViewBag.MonthLabels ?? "[]");
+        const monthlyOrders = @Html.Raw(ViewBag.MonthlyOrders ?? "[]");
+        const monthlySpend = @Html.Raw(ViewBag.MonthlySpend ?? "[]");
+
+        const tl = v => '₺' + Number(v).toLocaleString('tr-TR', { maximumFractionDigits: 0 });
+        Chart.defaults.color = '#8a8f98';
+        Chart.defaults.font.family = 'inherit';
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+        // ===== Sadakat halkası (sadece canvas varsa) =====
+        const ring = document.getElementById('ScoreRing');
+        if (ring) {
+            const ringColor = loyaltyScore >= 86 ? '#10b981'
+                            : loyaltyScore >= 66 ? '#3b82f6'
+                            : loyaltyScore >= 46 ? '#f59e0b'
+                            : '#e11d48';
+
+            new Chart(ring, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [loyaltyScore, 100 - loyaltyScore],
+                        backgroundColor: [ringColor, '#f0f1f4'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '80%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                }
+            });
+        }
+
+        // ===== Aylık sipariş + harcama =====
+        new Chart(document.getElementById('MonthlyChart'), {
+            data: {
+                labels: monthLabels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Harcama',
+                        data: monthlySpend,
+                        backgroundColor: 'rgba(249,99,50,.25)',
+                        hoverBackgroundColor: 'rgba(249,99,50,.45)',
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    },
+                    {
+                        type: 'line',
+                        label: 'Sipariş',
+                        data: monthlyOrders,
+                        borderColor: '#7c3aed',
+                        backgroundColor: '#7c3aed',
+                        borderWidth: 2.5,
+                        tension: .35,
+                        pointRadius: 3,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: c => c.dataset.label === 'Harcama'
+                                ? 'Harcama: ' + tl(c.raw)
+                                : 'Sipariş: ' + c.raw
+                        }
+                    }
+                },
+                scales: {
+                    y: { position: 'left', ticks: { callback: v => tl(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    y1: { position: 'right', beginAtZero: true, grid: { display: false }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+    })();
+</script>

@@ -1,0 +1,409 @@
+﻿@model Customer
+@{
+    ViewData["Title"] = "AI Değerlendirme Analizi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .ai-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8a8f98;
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+
+        .ai-back:hover {
+            color: #f59e0b;
+            text-decoration: none;
+        }
+
+    .ai-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+        .ai-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .ai-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .ai-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(245,158,11,.12);
+        color: #d97706;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .ai-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .ai-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .ai-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .ai-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .ai-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    /* ===== Müşteri kartı ===== */
+    .ai-customer {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .ai-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        flex-shrink: 0;
+    }
+
+    .ai-customer b {
+        display: block;
+        font-size: 16px;
+        color: #2d2d2d;
+    }
+
+    .ai-customer small {
+        color: #8a8f98;
+        font-weight: 600;
+    }
+
+    .ai-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px 22px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(245,158,11,.28);
+        transition: transform .15s, opacity .15s;
+    }
+
+        .ai-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .ai-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+    /* ===== Gönderilen veri listesi ===== */
+    .ai-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .ai-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid #f6f7f9;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+            .ai-list li:last-child {
+                border-bottom: none;
+            }
+
+            .ai-list li i {
+                width: 28px;
+                height: 28px;
+                border-radius: 8px;
+                display: grid;
+                place-items: center;
+                font-size: 14px;
+                flex-shrink: 0;
+            }
+
+    .ok i {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .no i {
+        background: rgba(225,29,72,.10);
+        color: #e11d48;
+    }
+
+    /* ===== Sonuç ===== */
+    .ai-result {
+        min-height: 260px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ai-text {
+        color: #374151;
+        font-size: 14px;
+        line-height: 1.75;
+        white-space: pre-line;
+    }
+
+    .ai-error {
+        padding: 14px 18px;
+        border-radius: 12px;
+        background: rgba(225,29,72,.08);
+        color: #be123c;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .ai-meta {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid #f0f1f4;
+        font-size: 12px;
+        color: #a3a8b1;
+        font-weight: 600;
+    }
+
+    /* ===== Yükleniyor animasyonu ===== */
+    .ai-loading {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        color: #d97706;
+        font-weight: 700;
+        padding: 30px 10px;
+    }
+
+    .dots {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        margin-bottom: 12px;
+    }
+
+        .dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #f59e0b;
+            animation: bounce 1s infinite ease-in-out;
+        }
+
+            .dots span:nth-child(2) {
+                animation-delay: .15s;
+            }
+
+            .dots span:nth-child(3) {
+                animation-delay: .3s;
+            }
+
+    @@keyframes bounce {
+        0%, 80%, 100% {
+            transform: scale(.5);
+            opacity: .4;
+        }
+
+        40% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+
+    <a href="/AdminCustomer/CustomerDetail?customerId=@Model.CustomerId" class="ai-back">
+        <i class="zmdi zmdi-arrow-left"></i> Müşteri detayına dön
+    </a>
+
+    <!-- BAŞLIK -->
+    <div class="ai-hero">
+        <div>
+            <h2>AI Değerlendirme Analizi</h2>
+            <p>@Model.CustomerName @Model.CustomerSurname adlı müşterinin değerlendirmelerinin yapay zeka yorumu</p>
+        </div>
+        <span class="ai-badge"><i class="zmdi zmdi-star"></i> OpenAI</span>
+    </div>
+
+    <div class="row ai-row">
+
+        <!-- SOL: MÜŞTERİ + GÖNDERİLEN VERİ -->
+        <div class="col-lg-4">
+            <div style="width:100%;">
+
+                <div class="ai-card" style="margin-bottom:20px;">
+                    <div class="ai-customer">
+                        <div class="ai-avatar">@(Model.CustomerName?.Substring(0, 1))@(Model.CustomerSurname?.Substring(0, 1))</div>
+                        <div>
+                            <b>@Model.CustomerName @Model.CustomerSurname</b>
+                            <small>#@Model.CustomerId · @Model.CustomerCity, @Model.CustomerCountry</small>
+                        </div>
+                    </div>
+
+                    <button type="button" class="ai-btn" id="AiButton" onclick="runReviewAnalysis()">
+                        <i class="zmdi zmdi-refresh"></i> Tekrar Analiz Et
+                    </button>
+                </div>
+
+                <div class="ai-card">
+                    <div class="ai-card-head">
+                        <h5>Gönderilen Veriler</h5>
+                        <small>Son 10 değerlendirme</small>
+                    </div>
+
+                    <ul class="ai-list">
+                        <li class="ok"><i class="zmdi zmdi-check"></i> Ürün adı</li>
+                        <li class="ok"><i class="zmdi zmdi-check"></i> Satın alma türü</li>
+                        <li class="ok"><i class="zmdi zmdi-check"></i> Puan (1-5)</li>
+                        <li class="ok"><i class="zmdi zmdi-check"></i> Duygu etiketi</li>
+                        <li class="ok"><i class="zmdi zmdi-check"></i> Yorum metni ve tarih</li>
+                        <li class="no"><i class="zmdi zmdi-close"></i> Ad, soyad, e-posta, telefon, adres</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SAĞ: SONUÇ -->
+        <div class="col-lg-8">
+            <div class="ai-card ai-result">
+                <div class="ai-card-head">
+                    <h5>Analiz Sonucu</h5>
+                    <small id="AiResultTitle">Hazırlanıyor</small>
+                </div>
+
+                <div id="AiResult" style="flex:1; display:flex; flex-direction:column;"></div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const customerId = @Model.CustomerId;
+
+    async function runReviewAnalysis() {
+        const btn = document.getElementById('AiButton');
+        const result = document.getElementById('AiResult');
+        const title = document.getElementById('AiResultTitle');
+
+        // Yükleniyor durumu
+        btn.disabled = true;
+        title.textContent = 'Analiz yapılıyor';
+        result.innerHTML =
+            '<div class="ai-loading"><div>' +
+                '<div class="dots"><span></span><span></span><span></span></div>' +
+                'Yapay zeka değerlendirmeleri okuyor...' +
+            '</div></div>';
+
+        try {
+            const res = await fetch('/AdminCustomer/AiReviewAnalysis', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'customerId=' + customerId
+            });
+
+            const raw = await res.text();
+            let data;
+
+            try {
+                data = JSON.parse(raw);
+            } catch {
+                throw new Error('Sunucu ' + res.status + ' döndü.');
+            }
+
+            result.innerHTML = '';
+
+            if (data.success) {
+                const time = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                title.textContent = 'Son analiz: ' + time;
+
+                // Metni güvenli şekilde ekle (textContent HTML'i çalıştırmaz)
+                const text = document.createElement('div');
+                text.className = 'ai-text';
+                text.textContent = data.message;
+                result.appendChild(text);
+
+                const meta = document.createElement('div');
+                meta.className = 'ai-meta';
+                meta.innerHTML = '<i class="zmdi zmdi-info-outline"></i> Yapay zeka çıktısıdır, kontrol ederek kullan.';
+                result.appendChild(meta);
+            } else {
+                title.textContent = 'Analiz yapılamadı';
+
+                const err = document.createElement('div');
+                err.className = 'ai-error';
+                err.textContent = data.message;
+                result.appendChild(err);
+            }
+        } catch (e) {
+            title.textContent = 'Analiz yapılamadı';
+            result.innerHTML = '';
+            const err = document.createElement('div');
+            err.className = 'ai-error';
+            err.textContent = e.message;
+            result.appendChild(err);
+        }
+
+        btn.disabled = false;
+    }
+
+    // Sayfa açılınca analizi otomatik başlat
+    runReviewAnalysis();
+</script>

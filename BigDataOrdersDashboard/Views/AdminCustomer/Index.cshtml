@@ -377,6 +377,25 @@
             min-width: 120px;
             border-radius: 10px;
         }
+    .action-btn.detail {
+        background: rgba(124,58,237,.10);
+        color: #7c3aed;
+    }
+
+        .action-btn.detail:hover {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+    .customer-link {
+        color: inherit;
+        text-decoration: none;
+    }
+
+        .customer-link:hover {
+            color: #f96332;
+            text-decoration: none;
+        }
 </style>
 
 <div class="container-fluid">
@@ -457,39 +476,42 @@
                     {
                         var initials = (item.CustomerName?.Substring(0, 1) ?? "") + (item.CustomerSurname?.Substring(0, 1) ?? "");
 
-                        <tr>
-                            <td>
-                                <div class="customer-cell">
-                                    <img src="@item.CustomerImageUrl" class="customer-avatar" alt=""
-                                         onerror="this.outerHTML='<div class=&quot;customer-avatar&quot;>@initials.ToUpper()</div>'" />
-                                    <div>
-                                        <span class="customer-name">@item.CustomerName @item.CustomerSurname</span>
-                                        <span class="customer-id">#@item.CustomerId</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="contact-line"><i class="zmdi zmdi-email"></i> @item.CustomerEmail</span>
-                                <span class="contact-line"><i class="zmdi zmdi-phone"></i> @item.CustomerPhone</span>
-                            </td>
-                            <td><span class="country-badge">@item.CustomerCountry</span></td>
-                            <td>
-                                <span class="location-main">@item.CustomerCity / @item.CustomerDistrict</span>
-                                <span class="location-sub" title="@item.CustomerAddress">@item.CustomerAddress</span>
-                            </td>
-                            <td class="text-right" style="white-space:nowrap;">
-                                <a href="/AdminCustomer/UpdateCustomer/@item.CustomerId" class="action-btn edit" title="Güncelle">
-                                    <i class="zmdi zmdi-edit"></i>
-                                </a>
-                                <button type="button" class="action-btn delete" title="Sil"
-                                        data-toggle="modal" data-target="#deleteModal"
-                                        data-name="@item.CustomerName @item.CustomerSurname"
-                                        data-url="/AdminCustomer/DeleteCustomer/@item.CustomerId"
-                                        onclick="setDeleteModal(this)">
-                                    <i class="zmdi zmdi-delete"></i>
-                                </button>
-                            </td>
-                        </tr>
+                      <tr>
+                          <td>
+                              <div class="customer-cell">
+                                  <img src="@item.CustomerImageUrl" class="customer-avatar" alt=""
+                                       onerror="this.outerHTML='<div class=&quot;customer-avatar&quot;>@initials.ToUpper()</div>'" />
+                                  <div>
+                                      <a href="/AdminCustomer/CustomerDetail?customerId=@item.CustomerId" class="customer-name customer-link">@item.CustomerName @item.CustomerSurname</a>
+                                      <span class="customer-id">#@item.CustomerId</span>
+                                  </div>
+                              </div>
+                          </td>
+                          <td>
+                              <span class="contact-line"><i class="zmdi zmdi-email"></i> @item.CustomerEmail</span>
+                              <span class="contact-line"><i class="zmdi zmdi-phone"></i> @item.CustomerPhone</span>
+                          </td>
+                          <td><span class="country-badge">@item.CustomerCountry</span></td>
+                          <td>
+                              <span class="location-main">@item.CustomerCity / @item.CustomerDistrict</span>
+                              <span class="location-sub" title="@item.CustomerAddress">@item.CustomerAddress</span>
+                          </td>
+                          <td class="text-right" style="white-space:nowrap;">
+                              <a href="/AdminCustomer/CustomerDetail?customerId=@item.CustomerId" class="action-btn detail" title="Detay">
+                                  <i class="zmdi zmdi-eye"></i>
+                              </a>
+                              <a href="/AdminCustomer/UpdateCustomer/@item.CustomerId" class="action-btn edit" title="Güncelle">
+                                  <i class="zmdi zmdi-edit"></i>
+                              </a>
+                              <button type="button" class="action-btn delete" title="Sil"
+                                      data-toggle="modal" data-target="#deleteModal"
+                                      data-name="@item.CustomerName @item.CustomerSurname"
+                                      data-url="/AdminCustomer/DeleteCustomer/@item.CustomerId"
+                                      onclick="setDeleteModal(this)">
+                                  <i class="zmdi zmdi-delete"></i>
+                              </button>
+                          </td>
+                      </tr>
                     }
                 </tbody>
             </table>

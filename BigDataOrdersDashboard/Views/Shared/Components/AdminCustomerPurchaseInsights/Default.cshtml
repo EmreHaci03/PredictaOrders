@@ -1,0 +1,113 @@
+﻿@{ 
+    int count = 0;
+
+}
+<div class="row cd-row">
+    <div class="col-lg-4">
+        <div class="cd-card">
+            <div class="cd-card-head">
+                <h5>En Çok Aldığı Ürünler</h5>
+                <small>Adede göre</small>
+            </div>
+            @if (ViewBag.FavoriteProducts != null)
+            {
+                <ul class="fav-list" id="FavoriteProducts">
+                    @foreach (var item in ViewBag.FavoriteProducts)
+                    {
+                        count++;
+                    <li>
+                        <span class="fav-rank">@count</span>
+                        <span class="fav-name">@item.Product<small>@item.Category</small></span>
+                        <span class="fav-value">@item.Count<small>adet</small></span>
+                    </li>
+                    }
+                </ul>
+             }
+            </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="cd-card">
+            <div class="cd-card-head">
+                <h5>Kategori Dağılımı</h5>
+                <small>Harcamaya göre</small>
+            </div>
+            <div class="chart-box"><canvas id="CategoryChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="cd-card">
+            <div class="cd-card-head">
+                <h5>Ödeme Yöntemleri</h5>
+                <small>Sipariş sayısı</small>
+            </div>
+            <div class="chart-box"><canvas id="PaymentChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const categories = @Html.Raw(ViewBag.CategoryName);
+        const categorySpend = @Html.Raw(ViewBag.CategorySpend);
+        const payments = @Html.Raw(ViewBag.Payments);
+        const paymentCounts = @Html.Raw(ViewBag.PaymentCount);
+
+        const num = v => Number(v).toLocaleString('tr-TR');
+        const tl = v => '₺' + Number(v).toLocaleString('tr-TR');
+        const palette = ['#f96332', '#3b82f6', '#10b981', '#7c3aed', '#f59e0b'];
+
+        function draw() {
+            // ===== Kategori dağılımı =====
+            new Chart(document.getElementById('CategoryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: categorySpend,
+                        backgroundColor: palette,
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '62%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 8, padding: 12 } },
+                        tooltip: { callbacks: { label: c => c.label + ': ' + tl(c.raw) } }
+                    }
+                }
+            });
+
+            // ===== Ödeme yöntemleri =====
+            new Chart(document.getElementById('PaymentChart'), {
+                type: 'bar',
+                data: {
+                    labels: payments,
+                    datasets: [{
+                        data: paymentCounts,
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                        borderRadius: 8,
+                        barThickness: 26
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: c => num(c.raw) + ' sipariş' } }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: '#f0f1f4' }, border: { display: false } },
+                        y: { grid: { display: false }, border: { display: false }, ticks: { font: { weight: '600' } } }
+                    }
+                }
+            });
+        }
+
+        if (window.Chart) draw();
+        else window.addEventListener('load', draw);
+    })();
+</script>

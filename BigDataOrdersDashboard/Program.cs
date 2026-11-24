@@ -1,6 +1,7 @@
 using BigDataOrdersDashboard.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,13 @@ builder.Services.AddDbContext<BigDataDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddScoped(_=> new MLContext(seed:1));
+builder.Services.AddHttpClient();
+
+builder.Services.AddHttpClient("OpenAI", client=>
+{
+    client.BaseAddress = new Uri("https://api.openai.com/v1/");
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", builder.Configuration["OpenAI:Key"]);
+});
 builder.Services.AddMemoryCache();
 var app = builder.Build();
 

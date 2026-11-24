@@ -1,0 +1,59 @@
+﻿@model CustomerKpiViewModel
+
+@{
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+}
+
+<div class="row cd-row">
+    <div class="col-lg-3 col-md-6">
+        <div class="cd-card stat">
+            <div class="stat-icon i-orange"><i class="zmdi zmdi-shopping-cart"></i></div>
+            <div>
+                <div class="stat-label">Toplam Sipariş</div>
+                <div class="stat-value" id="TotalOrders">@Model.TotalOrderCount.ToString("N0", tr)</div>
+                <div class="stat-sub"><span id="TotalQuantity">@Model.UniqueProductCount.ToString("N0", tr)</span> ayrı ürün</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="cd-card stat">
+            <div class="stat-icon i-green"><i class="zmdi zmdi-money"></i></div>
+            <div>
+                <div class="stat-label">Toplam Harcama</div>
+                <div class="stat-value" id="TotalSpend">₺@Model.TotalSpend.ToString("N2", tr)</div>
+                <div class="stat-sub">ülke ortalamasının <span id="SpendVsAvg">%138</span>'i</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="cd-card stat">
+            <div class="stat-icon i-blue"><i class="zmdi zmdi-shopping-basket"></i></div>
+            <div>
+                <div class="stat-label">Ortalama Sepet</div>
+                <div class="stat-value" id="AvgBasket">₺@Model.AverageBasketAmount.ToString("N2", tr)</div>
+                <div class="stat-sub">sipariş başına</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="cd-card stat">
+            <div class="stat-icon i-purple"><i class="zmdi zmdi-time"></i></div>
+            <div>
+                <div class="stat-label">Son Sipariş</div>
+                @if (Model.LastOrderDate.HasValue)
+                {
+                    <div class="stat-value">@Model.DaysSinceLastOrder gün önce</div>
+                    <div class="stat-sub">@Model.LastOrderDate.Value.ToString("dd MMMM yyyy", tr)</div>
+                }
+                else
+                {
+                    <div class="stat-value">—</div>
+                    <div class="stat-sub">henüz sipariş yok</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
