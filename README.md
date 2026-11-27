@@ -1,4 +1,4 @@
-# 📊 BigDataOrdersDashboard
+# 📊 PredictaOrders
 
 500.000+ siparişlik bir e-ticaret veri seti üzerinde çalışan; **veri analizi**, **ML.NET ile tahminleme ve kümeleme** ve **OpenAI ile yapay zeka destekli müşteri analizi** yapan bir ASP.NET Core MVC yönetim paneli.
 
@@ -108,7 +108,7 @@ Projenin amacı, büyük bir veri setiyle çalışırken SQL ve LINQ sorguların
 
 1. Projeyi klonlayın:
    ```bash
-   git clone https://github.com/EmreHaci03/BigDataOrdersDashboard.git
+   git clone https://github.com/EmreHaci03/PredictaOrders.git
    ```
 2. `appsettings.json` içindeki `DefaultConnection` bağlantı cümlesini kendi SQL Server'ınıza göre düzenleyin.
 3. Veritabanını oluşturun:
