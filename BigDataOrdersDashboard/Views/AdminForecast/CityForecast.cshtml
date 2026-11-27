@@ -283,8 +283,17 @@
     <!-- BAŞLIK + ÜLKE SEÇİMİ -->
     <div class="fc-hero">
         <div>
-            <h2>@(hasCountry ? country + " Şehir Tahmini" : "Şehir Tahmini")</h2>
-            <p>Seçilen ülkede en çok sipariş veren şehirlerin önümüzdeki 12 aylık sipariş tahmini</p>
+            <h2>@(hasCountry ? country : "Şehir Tahmini")</h2>
+            <p>
+                @if (hasCountry)
+                {
+                    <text>En çok sipariş veren şehirlerin önümüzdeki 12 aylık tahmini</text>
+                }
+                else
+                {
+                    <text>Bir ülke seçerek şehirlerin 12 aylık sipariş tahminini görüntüleyin</text>
+                }
+            </p>
         </div>
 
         <form method="get" action="/AdminForecast/CityForecast" class="fc-filter">

@@ -22,4 +22,9 @@
     <PackageReference Include="Microsoft.ML.TimeSeries" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewComponents\AdminProduct\" />
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
 </Project>

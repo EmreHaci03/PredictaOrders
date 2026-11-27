@@ -1,0 +1,483 @@
+﻿@{
+    ViewData["Title"] = "Satış Tahmini";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    bool hasData = ViewBag.OrderForecast != null && ViewBag.MonthLabels != null;
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    double historyTotal = ViewBag.HistoryTotal != null ? Convert.ToDouble(ViewBag.HistoryTotal) : 0;
+}
+
+<style>
+    .fc-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+        .fc-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .fc-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .fc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(124,58,237,.08);
+        color: #7c3aed;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .fc-note {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: rgba(245,158,11,.10);
+        color: #92400e;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+
+        .fc-note i {
+            font-size: 18px;
+            margin-top: 1px;
+        }
+
+    .fc-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .fc-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .fc-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+        .fc-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .fc-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .fc-toggle {
+        display: inline-flex;
+        background: #f3f4f7;
+        border-radius: 10px;
+        padding: 3px;
+    }
+
+        .fc-toggle button {
+            border: none;
+            background: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #8a8f98;
+            cursor: pointer;
+        }
+
+            .fc-toggle button.active {
+                background: #fff;
+                color: #2d2d2d;
+                box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            }
+
+    .fc-stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .fc-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .fc-stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .fc-stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #2d2d2d;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .fc-stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 360px;
+    }
+
+    .fc-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .fc-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+            .fc-table th:first-child, .fc-table td:first-child {
+                text-align: left;
+            }
+
+        .fc-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .fc-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .fc-table tfoot td {
+            font-weight: 800;
+            color: #2d2d2d;
+            border-top: 2px solid #f0f1f4;
+            border-bottom: none;
+        }
+
+    .fc-empty {
+        text-align: center;
+        padding: 70px 20px;
+        color: #8a8f98;
+    }
+
+        .fc-empty i {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 14px;
+            color: #c4c8d0;
+        }
+
+        .fc-empty h5 {
+            font-weight: 800;
+            color: #2d2d2d;
+            margin-bottom: 6px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <div class="fc-hero">
+        <div>
+            <h2>Satış Tahmini</h2>
+            <p>Tüm siparişlerin önümüzdeki 12 aylık adet ve gelir tahmini</p>
+        </div>
+        <span class="fc-badge"><i class="zmdi zmdi-memory"></i> ML.NET · SSA Zaman Serisi</span>
+    </div>
+
+    @if (!hasData)
+    {
+        <div class="fc-card fc-empty">
+            <i class="zmdi zmdi-chart"></i>
+            <h5>Veri bulunamadı</h5>
+            2023–2025 arasında tahmin yapılacak sipariş verisi yok.
+        </div>
+    }
+    else
+    {
+        <div class="fc-note">
+            <i class="zmdi zmdi-info-outline"></i>
+            <div>
+                Tahminler <b>2023–2025</b> yıllarına ait <b>@historyTotal.ToString("N0", tr)</b> siparişle eğitilen iki ayrı ML.NET modeliyle (adet ve gelir) üretilmiştir.
+                Grafikte kesikli çizgi 2025'in gerçekleşen değerlerini gösterir.
+            </div>
+        </div>
+
+        <!-- ÖZET KARTLAR -->
+        <div class="row fc-row">
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-orange"><i class="zmdi zmdi-shopping-cart"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Tahmini Sipariş</div>
+                        <div class="fc-stat-value" id="TotalOrders">-</div>
+                        <div class="fc-stat-sub">2025'e göre <span id="OrdersVsLast">-</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-green"><i class="zmdi zmdi-money"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Tahmini Gelir</div>
+                        <div class="fc-stat-value" id="TotalRevenue">-</div>
+                        <div class="fc-stat-sub">2025'e göre <span id="RevenueVsLast">-</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-purple"><i class="zmdi zmdi-shopping-basket"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Tahmini Ortalama Sepet</div>
+                        <div class="fc-stat-value" id="AvgBasket">-</div>
+                        <div class="fc-stat-sub">sipariş başına</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-blue"><i class="zmdi zmdi-calendar-alt"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">En Yoğun Ay</div>
+                        <div class="fc-stat-value" id="PeakMonth">-</div>
+                        <div class="fc-stat-sub"><span id="PeakMonthValue">-</span> sipariş</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAFİK -->
+        <div class="row fc-row">
+            <div class="col-12">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Aylık Tahmin · 2025 ile Karşılaştırma</h5>
+                        <div class="fc-toggle" id="MetricToggle">
+                            <button type="button" class="active" data-metric="orders">Sipariş</button>
+                            <button type="button" data-metric="revenue">Gelir</button>
+                        </div>
+                    </div>
+                    <div class="chart-box"><canvas id="SalesChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLO -->
+        <div class="row fc-row">
+            <div class="col-12">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Ay Ay Tahmin Tablosu</h5>
+                        <small>Gerçekleşen (2025) ve tahmin</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="fc-table" id="SalesTable">
+                            <thead>
+                                <tr>
+                                    <th>Ay</th>
+                                    <th>2025 Sipariş</th>
+                                    <th>Tahmini Sipariş</th>
+                                    <th>2025 Gelir</th>
+                                    <th>Tahmini Gelir</th>
+                                    <th>Değişim</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+        <script>
+            (function () {
+                const monthLabels = @Html.Raw(ViewBag.MonthLabels);
+                const orderForecast = @Html.Raw(ViewBag.OrderForecast);
+                const revenueForecast = @Html.Raw(ViewBag.RevenueForecast);
+                const lastYearOrders = @Html.Raw(ViewBag.LastYearOrders);
+                const lastYearRevenue = @Html.Raw(ViewBag.LastYearRevenue);
+
+                const num = v => Math.round(v).toLocaleString('tr-TR');
+                const tl = v => '₺' + Math.round(v).toLocaleString('tr-TR');
+                const sum = arr => arr.reduce((a, b) => a + b, 0);
+                const pct = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+                const setChange = (el, v) => { el.textContent = pct(v); el.style.color = v >= 0 ? '#059669' : '#e11d48'; };
+
+                // ===== Hesaplamalar =====
+                const totalOrders = sum(orderForecast);
+                const totalRevenue = sum(revenueForecast);
+                const lastOrders = sum(lastYearOrders);
+                const lastRevenue = sum(lastYearRevenue);
+                const peakIndex = orderForecast.indexOf(Math.max(...orderForecast));
+
+                // ===== Kartlar =====
+                document.getElementById('TotalOrders').textContent = num(totalOrders);
+                setChange(document.getElementById('OrdersVsLast'), lastOrders > 0 ? (totalOrders - lastOrders) * 100 / lastOrders : 0);
+
+                document.getElementById('TotalRevenue').textContent = tl(totalRevenue);
+                setChange(document.getElementById('RevenueVsLast'), lastRevenue > 0 ? (totalRevenue - lastRevenue) * 100 / lastRevenue : 0);
+
+                document.getElementById('AvgBasket').textContent = totalOrders > 0 ? tl(totalRevenue / totalOrders) : '-';
+
+                document.getElementById('PeakMonth').textContent = monthLabels[peakIndex];
+                document.getElementById('PeakMonthValue').textContent = num(orderForecast[peakIndex]);
+
+                // ===== Grafik =====
+                Chart.defaults.color = '#8a8f98';
+                Chart.defaults.font.family = 'inherit';
+                Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+                const metrics = {
+                    orders:  { forecast: orderForecast,   actual: lastYearOrders,  color: '#f96332', fill: 'rgba(249,99,50,.10)', fmt: num, unit: ' sipariş' },
+                    revenue: { forecast: revenueForecast, actual: lastYearRevenue, color: '#059669', fill: 'rgba(16,185,129,.10)', fmt: tl,  unit: '' }
+                };
+                let current = 'orders';
+
+                const chart = new Chart(document.getElementById('SalesChart'), {
+                    type: 'line',
+                    data: { labels: monthLabels, datasets: [] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: { callbacks: { label: c => c.dataset.label + ': ' + metrics[current].fmt(c.raw) + metrics[current].unit } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { callback: v => metrics[current].fmt(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                            x: { grid: { display: false }, border: { display: false } }
+                        }
+                    }
+                });
+
+                function render(metric) {
+                    current = metric;
+                    const m = metrics[metric];
+                    chart.data.datasets = [
+                        {
+                            label: 'Tahmin',
+                            data: m.forecast,
+                            borderColor: m.color,
+                            backgroundColor: m.fill,
+                            borderWidth: 2.5, tension: .35, pointRadius: 3, pointHoverRadius: 6, fill: true
+                        },
+                        {
+                            label: '2025 Gerçekleşen',
+                            data: m.actual,
+                            borderColor: '#a3a8b1',
+                            backgroundColor: '#a3a8b1',
+                            borderWidth: 2, borderDash: [6, 4], tension: .35, pointRadius: 0, fill: false
+                        }
+                    ];
+                    chart.update();
+                }
+
+                document.querySelectorAll('#MetricToggle button').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('#MetricToggle button').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        render(btn.dataset.metric);
+                    });
+                });
+
+                render('orders');
+
+                // ===== Tablo =====
+                const tbody = document.querySelector('#SalesTable tbody');
+                tbody.innerHTML = monthLabels.map((m, i) => {
+                    const diff = lastYearOrders[i] > 0 ? (orderForecast[i] - lastYearOrders[i]) * 100 / lastYearOrders[i] : 0;
+                    return `<tr>
+                                <td><b>${m}</b></td>
+                                <td>${num(lastYearOrders[i])}</td>
+                                <td><b>${num(orderForecast[i])}</b></td>
+                                <td>${tl(lastYearRevenue[i])}</td>
+                                <td><b>${tl(revenueForecast[i])}</b></td>
+                                <td><span style="color:${diff >= 0 ? '#059669' : '#e11d48'};font-weight:700">${pct(diff)}</span></td>
+                            </tr>`;
+                }).join('');
+
+                const totalDiff = lastOrders > 0 ? (totalOrders - lastOrders) * 100 / lastOrders : 0;
+                document.querySelector('#SalesTable tfoot').innerHTML =
+                    `<tr>
+                        <td>Toplam</td>
+                        <td>${num(lastOrders)}</td>
+                        <td>${num(totalOrders)}</td>
+                        <td>${tl(lastRevenue)}</td>
+                        <td>${tl(totalRevenue)}</td>
+                        <td><span style="color:${totalDiff >= 0 ? '#059669' : '#e11d48'}">${pct(totalDiff)}</span></td>
+                    </tr>`;
+            })();
+        </script>
+    }
+
+</div>

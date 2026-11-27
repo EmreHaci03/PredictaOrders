@@ -1,0 +1,720 @@
+﻿@{
+    ViewData["Title"] = "Ürün Performansı";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .pp-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+        .pp-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .pp-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .pp-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(0,0,0,.05);
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #a3a8b1;
+        margin: 6px 0 14px;
+    }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eceef2;
+        }
+
+    .pp-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .pp-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .pp-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .pp-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .pp-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    /* ===== KPI ===== */
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #2d2d2d;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    .i-red {
+        background: rgba(225,29,72,.12);
+        color: #e11d48;
+    }
+
+    .i-yellow {
+        background: rgba(245,158,11,.14);
+        color: #d97706;
+    }
+
+    .i-cyan {
+        background: rgba(8,145,178,.12);
+        color: #0891b2;
+    }
+
+    .i-gray {
+        background: rgba(148,163,184,.16);
+        color: #64748b;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 300px;
+    }
+
+    /* ===== Tablolar ===== */
+    .pp-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .pp-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .pp-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .pp-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .pp-table .num {
+            text-align: right;
+        }
+
+        .pp-table .strong {
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+    .abc-tag {
+        display: inline-grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        font-weight: 800;
+        font-size: 13px;
+    }
+
+    .abc-a {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .abc-b {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .abc-c {
+        background: rgba(148,163,184,.16);
+        color: #64748b;
+    }
+
+    .bar-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .mini-bar {
+        width: 90px;
+        height: 6px;
+        border-radius: 999px;
+        background: #f0f1f4;
+        overflow: hidden;
+    }
+
+        .mini-bar div {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+    /* ===== Listeler ===== */
+    .p-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .p-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px solid #f6f7f9;
+        }
+
+            .p-list li:last-child {
+                border-bottom: none;
+            }
+
+    .p-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+    .p-name {
+        flex: 1;
+        min-width: 0;
+        font-weight: 700;
+        color: #2d2d2d;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .p-name small {
+            display: block;
+            color: #a3a8b1;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+    .p-value {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+        .p-value b {
+            display: block;
+            color: #2d2d2d;
+            font-size: 14px;
+        }
+
+        .p-value small {
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+    .t-red {
+        color: #e11d48;
+    }
+
+    .t-yellow {
+        color: #d97706;
+    }
+
+    .t-gray {
+        color: #8a8f98;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- BAŞLIK -->
+    <div class="pp-hero">
+        <div>
+            <h2>Ürün Performansı</h2>
+            <p>Satış, ciro, stok ve değerlendirmelere göre ürün analizi</p>
+        </div>
+        <span class="pp-pill"><i class="zmdi zmdi-shopping-basket"></i> Toplam <b id="TotalProductCount">&nbsp;@(((int)(ViewBag.TotalProductCount ?? 0)).ToString("N0"))</b>&nbsp;Farklı ürün</span>
+    </div>
+
+    <!-- ===== KPI SATIR 1: SATIŞ ===== -->
+    <div class="section-title"><i class="zmdi zmdi-trending-up"></i> Satış Performansı</div>
+    <div class="row pp-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-orange"><i class="zmdi zmdi-fire"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">En Çok Satan Ürün</div>
+                    <div class="stat-value" id="TopSellingProduct">@(ViewBag.TopSellingProduct?.Product ?? "-")</div>
+                    <div class="stat-sub"><span id="TopSellingQuantity">@(((int)(ViewBag.TopSellingProduct?.Quantity ?? 0)).ToString("N0"))</span> adet</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-green"><i class="zmdi zmdi-money"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">En Çok Ciro Getiren</div>
+                    <div class="stat-value" id="TopRevenueProduct">@(ViewBag.TopRevenueProduct?.Product ?? "-")</div>
+                    <div class="stat-sub">₺<span id="TopRevenueAmount">@(((decimal)(ViewBag.TopRevenueProduct?.TotalRevenue ?? 0)).ToString("N0"))</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-gray"><i class="zmdi zmdi-block"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">Hiç Satılmamış Ürün</div>
+                    <div class="stat-value" id="UnsoldProductCount">@(ViewBag.UnSoldProductCount ?? 0)</div>
+                    <div class="stat-sub">ürün</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-red"><i class="zmdi zmdi-close-circle"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">En Çok İptal Edilen</div>
+                    <div class="stat-value" id="MostCancelledProduct">@(ViewBag.MostCancelledProduct?.Product ?? "-")</div>
+                    <div class="stat-sub"><span id="MostCancelledCount">@(((ViewBag.MostCancelledProduct?.CancelCount ?? 0)).ToString("N0"))</span> iptal</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== KPI SATIR 2: ÜRÜN & STOK ===== -->
+    <div class="section-title"><i class="zmdi zmdi-label"></i> Ürün ve Stok</div>
+    <div class="row pp-row">
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-blue"><i class="zmdi zmdi-tag"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">Ortalama Ürün Birim Fiyatı</div>
+                    <div class="stat-value">₺<span id="AvgProductPrice">@(((decimal)(ViewBag.AvgProductPrice ?? 0m)).ToString("N0"))</span></div>
+                    <div class="stat-sub">tüm ürünler</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-yellow"><i class="zmdi zmdi-alert-triangle"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">Kritik Stok</div>
+                    <div class="stat-value" id="CriticalStockCount">@(((ViewBag.CriticalStockCount ?? 0)).ToString("N0"))</div>
+                    <div class="stat-sub">stoğu 50'nin altında</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-purple"><i class="zmdi zmdi-balance-wallet"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">Toplam Stok Değeri</div>
+                    <div class="stat-value">₺@(((decimal)(ViewBag.TotalStockValue ?? 0m)).ToString("N0"))</div>
+                    <div class="stat-sub">@(((int)(ViewBag.TotalStockQuantity ?? 0)).ToString("N0")) adet ürün</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="pp-card stat">
+                <div class="stat-icon i-cyan"><i class="zmdi zmdi-globe"></i></div>
+                <div style="min-width:0;">
+                    <div class="stat-label">En Çok Ürünün Geldiği Ülke</div>
+                    <div class="stat-value" id="TopOriginCountry">@(ViewBag.TopOriginCountry?.Country ?? "-")</div>
+                    <div class="stat-sub"><span id="TopOriginCount">@(((ViewBag.TopOriginCountry?.Count ?? 0)).ToString("N0"))</span> ürün</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== GRAFİKLER ===== -->
+    <div class="section-title"><i class="zmdi zmdi-chart"></i> Grafikler</div>
+    <div class="row pp-row">
+        <div class="col-lg-8">
+            <div class="pp-card">
+                <div class="pp-card-head">
+                    <h5>Kategorilere Göre Ciro</h5>
+                    <small>Toplam satış tutarı</small>
+                </div>
+                <div class="chart-box"><canvas id="CategoryRevenueChart"></canvas></div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="pp-card">
+                <div class="pp-card-head">
+                    <h5>Kategorilere Göre Ürün Sayısı</h5>
+                    <small>Katalogdaki ürün</small>
+                </div>
+                <div class="chart-box"><canvas id="CategoryProductChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pp-row">
+        <div class="col-lg-6">
+            <div class="pp-card">
+                <div class="pp-card-head">
+                    <h5>En Çok Satan 10 Ürün</h5>
+                    <small>Adet</small>
+                </div>
+                <div class="chart-box" style="height:360px;"><canvas id="TopProductsChart"></canvas></div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="pp-card">
+                <div class="pp-card-head">
+                    <h5>Kategorilere Göre İptal Oranı</h5>
+                    <small>İptal edilen sipariş %</small>
+                </div>
+                <div class="chart-box" style="height:360px;"><canvas id="CancelRateChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DETAYLI ANALİZ: CİRO, STOK VE SATILMAYANLAR ===== -->
+    <div class="section-title"><i class="zmdi zmdi-format-list-numbered"></i> Detaylı Analiz</div>
+    <div class="row pp-row">
+        <div class="col-lg-6">
+            <div class="pp-card">
+                <div class="pp-card-head">
+                    <h5>En Çok Ciro Getiren 5 Ürün</h5>
+                    <small>Toplam cirodaki payı</small>
+                </div>
+                <div class="table-responsive">
+                    <table class="pp-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ürün</th>
+                                <th class="num">Adet</th>
+                                <th class="num">Ciro</th>
+                                <th class="num">Pay</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (ViewBag.TopRevenueProducts != null)
+                            {
+                                int rank = 1;
+
+                                foreach (var p in ViewBag.TopRevenueProducts)
+                                {
+                                    string share = ((double)p.Share).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+
+                                    <tr>
+                                        <td><span class="abc-tag @(rank == 1 ? "abc-a" : "abc-c")">@rank</span></td>
+                                        <td class="strong">@p.Product<small style="display:block; color:#a3a8b1; font-weight:500; font-size:12px;">@p.Category</small></td>
+                                        <td class="num">@(((int)p.Quantity).ToString("N0"))</td>
+                                        <td class="num strong">₺@(((decimal)p.Revenue).ToString("N0"))</td>
+                                        <td class="num">
+                                            <div class="bar-cell">
+                                                <div class="mini-bar"><div style="width:@(share)%; background:#10b981;"></div></div>
+                                                <b>%@(((double)p.Share).ToString("0.0"))</b>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    rank++;
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5" style="text-align:center; color:#a3a8b1;">Veri bulunamadı</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="pp-card">
+                <div class="pp-card-head">
+                    <h5>Kritik Stok</h5>
+                    <small>En az kalanlar</small>
+                </div>
+                <ul class="p-list" id="CriticalStockList">
+                    @if (ViewBag.CriticalStockList != null)
+                    {
+                        foreach (var p in ViewBag.CriticalStockList)
+                        {
+                            bool isVeryLow = p.StockQuantity < 20;
+
+                            <li>
+                                <span class="p-icon @(isVeryLow ? "i-red" : "i-yellow")">
+                                    <i class="zmdi @(isVeryLow ? "zmdi-alert-circle" : "zmdi-alert-triangle")"></i>
+                                </span>
+                                <span class="p-name">@p.ProductName<small>@p.CategoryName</small></span>
+                                <span class="p-value"><b>@p.StockQuantity</b><small class="@(isVeryLow ? "t-red" : "t-yellow")">adet</small></span>
+                            </li>
+                        }
+                    }
+                </ul>
+
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="pp-card">
+                <div class="pp-card-head">
+                    <h5>Hiç Satılmayanlar</h5>
+                    <small>Sipariş yok</small>
+                </div>
+                <ul class="p-list" id="UnsoldProductList">
+                    @if (ViewBag.UnSoldProductCount == 0)
+                    {
+                        <li style="justify-content:center; color:#a3a8b1;">Satılmayan ürün yok</li>
+
+                    }
+                    @if (ViewBag.UnSoldProducts != null)
+                    {
+                        foreach (var p in ViewBag.UnSoldProducts)
+                        {
+                            <li>
+                                <span class="p-icon i-gray"><i class="zmdi zmdi-block"></i></span>
+                                <span class="p-name">@p.Product<small>#@p.Id</small></span>
+                            </li>
+
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+    (function () {
+
+        const categoryNames = @Html.Raw(ViewBag.CategoryRevenueCategory);
+        const categoryRevenue = @Html.Raw(ViewBag.CategoryRevenue);
+
+        const categoryProductNames = @Html.Raw(ViewBag.CategoryProductNames);
+        const categoryProductCounts = @Html.Raw(ViewBag.CategoryProductCounts);
+
+        const topProductNames = @Html.Raw(ViewBag.TopProducts);
+        const topProductQuantities = @Html.Raw(ViewBag.TopProductsRevenue);
+
+        const cancelCategories = @Html.Raw(ViewBag.CancelCategories);
+        const cancelRates = @Html.Raw(ViewBag.CancelRates);
+
+        // ===== Ortak ayarlar =====
+        const num = v => Number(v).toLocaleString('tr-TR');
+        const tl = v => '₺' + Number(v).toLocaleString('tr-TR', { maximumFractionDigits: 0 });
+        const short = v => v >= 1000000 ? (v / 1000000).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + ' Mn' : num(v);
+
+        Chart.defaults.color = '#8a8f98';
+        Chart.defaults.font.family = 'inherit';
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+        const palette = ['#f96332', '#3b82f6', '#10b981', '#7c3aed', '#f59e0b', '#0891b2', '#db2777', '#64748b'];
+
+        // ===== Kategorilere göre ciro =====
+        new Chart(document.getElementById('CategoryRevenueChart'), {
+            type: 'bar',
+            data: {
+                labels: categoryNames,
+                datasets: [{
+                    label: 'Ciro',
+                    data: categoryRevenue,
+                    backgroundColor: palette,
+                    borderRadius: 8,
+                    barThickness: 38
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: c => tl(c.raw) } }
+                },
+                scales: {
+                    y: { ticks: { callback: v => '₺' + short(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    x: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // ===== Kategorilere göre ürün sayısı =====
+        new Chart(document.getElementById('CategoryProductChart'), {
+            type: 'doughnut',
+            data: {
+                labels: categoryProductNames,
+                datasets: [{
+                    data: categoryProductCounts,
+                    backgroundColor: palette,
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '62%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 8, padding: 10 } },
+                    tooltip: { callbacks: { label: c => c.label + ': ' + num(c.raw) + ' ürün' } }
+                }
+            }
+        });
+
+        // ===== En çok satan 10 ürün =====
+        new Chart(document.getElementById('TopProductsChart'), {
+            type: 'bar',
+            data: {
+                labels: topProductNames,
+                datasets: [{
+                    label: 'Adet',
+                    data: topProductQuantities,
+                    backgroundColor: topProductQuantities.map((v, i) => i === 0 ? '#f96332' : 'rgba(249,99,50,.35)'),
+                    borderRadius: 6,
+                    barThickness: 18
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: c => num(c.raw) + ' adet' } }
+                },
+                scales: {
+                    x: { ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    y: { grid: { display: false }, border: { display: false } }
+                }
+            }
+        });
+
+        // ===== Kategorilere göre iptal oranı =====
+        new Chart(document.getElementById('CancelRateChart'), {
+            type: 'bar',
+            data: {
+                labels: cancelCategories,
+                datasets: [{
+                    label: 'İptal oranı',
+                    data: cancelRates,
+                    backgroundColor: cancelRates.map((v, i) => i === 0 ? '#e11d48' : 'rgba(225,29,72,.3)'),
+                    borderRadius: 6,
+                    barThickness: 22
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: c => '%' + c.raw.toLocaleString('tr-TR') + ' iptal' } }
+                },
+                scales: {
+                    x: { beginAtZero: true, ticks: { callback: v => '%' + v }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                    y: { grid: { display: false }, border: { display: false }, ticks: { font: { weight: '600' } } }
+                }
+            }
+        });
+    })();
+</script>

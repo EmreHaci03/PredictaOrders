@@ -1,0 +1,525 @@
+﻿@{
+    ViewData["Title"] = "Kategori Tahmini";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var allCategories = ViewBag.AllCategories as List<string> ?? new List<string>();
+    string? selected = ViewBag.SelectedCategory;
+    bool hasCategory = !string.IsNullOrEmpty(selected);
+    bool hasData = ViewBag.Categories != null && ViewBag.CategoryLabels != null;
+
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    double historyTotal = ViewBag.HistoryTotal != null ? Convert.ToDouble(ViewBag.HistoryTotal) : 0;
+    double lastYearTotal = ViewBag.LastYearTotal != null ? Convert.ToDouble(ViewBag.LastYearTotal) : 0;
+}
+
+<style>
+    .fc-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+        .fc-hero h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            color: #2d2d2d;
+        }
+
+        .fc-hero p {
+            margin: 4px 0 0;
+            color: #8a8f98;
+        }
+
+    .fc-filter {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        padding: 8px 8px 8px 16px;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(0,0,0,.05);
+    }
+
+        .fc-filter label {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        .fc-filter select {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 8px 12px;
+            min-width: 200px;
+            outline: none;
+            color: #2d2d2d;
+            font-weight: 600;
+            background: #fff;
+        }
+
+            .fc-filter select:focus {
+                border-color: #7c3aed;
+            }
+
+    .fc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(124,58,237,.08);
+        color: #7c3aed;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    .fc-note {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: rgba(245,158,11,.10);
+        color: #92400e;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+
+        .fc-note i {
+            font-size: 18px;
+            margin-top: 1px;
+        }
+
+    .fc-row > [class*="col"] {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .fc-card {
+        width: 100%;
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .fc-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+        .fc-card-head h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d2d2d;
+        }
+
+        .fc-card-head small {
+            color: #a3a8b1;
+            font-weight: 600;
+        }
+
+    .fc-stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .fc-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .fc-stat-label {
+        color: #8a8f98;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .fc-stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #2d2d2d;
+        letter-spacing: -.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .fc-stat-sub {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8a8f98;
+        margin-top: 2px;
+    }
+
+    .i-orange {
+        background: rgba(249,99,50,.12);
+        color: #f96332;
+    }
+
+    .i-purple {
+        background: rgba(124,58,237,.12);
+        color: #7c3aed;
+    }
+
+    .i-green {
+        background: rgba(16,185,129,.12);
+        color: #059669;
+    }
+
+    .i-blue {
+        background: rgba(59,130,246,.12);
+        color: #2563eb;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 340px;
+    }
+
+    .fc-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .fc-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #a3a8b1;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f1f4;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+            .fc-table th:first-child, .fc-table td:first-child {
+                text-align: left;
+            }
+
+        .fc-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #f6f7f9;
+            color: #4b5563;
+            font-size: 14px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .fc-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .fc-table tfoot td {
+            font-weight: 800;
+            color: #2d2d2d;
+            border-top: 2px solid #f0f1f4;
+            border-bottom: none;
+        }
+
+    .fc-empty {
+        text-align: center;
+        padding: 70px 20px;
+        color: #8a8f98;
+    }
+
+        .fc-empty i {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 14px;
+            color: #c4c8d0;
+        }
+
+        .fc-empty h5 {
+            font-weight: 800;
+            color: #2d2d2d;
+            margin-bottom: 6px;
+        }
+</style>
+
+<div class="container-fluid">
+
+    <!-- BAŞLIK + KATEGORİ SEÇİMİ -->
+    <div class="fc-hero">
+        <div>
+            <h2>@(hasCategory ? selected + " Kategori Tahmini" : "Kategori Tahmini")</h2>
+            <p>Seçilen kategorinin önümüzdeki 12 aylık sipariş tahmini</p>
+        </div>
+
+        <form method="get" asp-action="CategoryForecast" class="fc-filter">
+            <label for="CategorySelect"><i class="zmdi zmdi-label"></i> Kategori</label>
+            <select id="CategorySelect" name="Category" onchange="this.form.submit()">
+                <option value="">Kategori seçin…</option>
+                @foreach (var c in allCategories)
+                {
+                    <option value="@c" selected="@(c == selected)">@c</option>
+                }
+            </select>
+        </form>
+    </div>
+
+    @if (!hasCategory)
+    {
+        <div class="fc-card fc-empty">
+            <i class="zmdi zmdi-label-alt"></i>
+            <h5>Bir kategori seçin</h5>
+            Tahmini görmek için sağ üstten bir kategori seçin.
+        </div>
+    }
+    else if (!hasData)
+    {
+        <div class="fc-card fc-empty">
+            <i class="zmdi zmdi-chart"></i>
+            <h5>Veri bulunamadı</h5>
+            <b>@selected</b> için 2023–2025 arasında tahmin yapılacak sipariş verisi yok.
+        </div>
+    }
+    else
+    {
+        <span class="fc-badge"><i class="zmdi zmdi-memory"></i> ML.NET · SSA Zaman Serisi</span>
+
+        <div class="fc-note">
+            <i class="zmdi zmdi-info-outline"></i>
+            <div>
+                Tahminler <b>2023–2025</b> yıllarına ait <b>@historyTotal.ToString("N0", tr)</b> adet <b>@selected</b> siparişiyle eğitilen ML.NET modeliyle üretilmiştir.
+            </div>
+        </div>
+
+        <!-- ÖZET KARTLAR -->
+        <div class="row fc-row">
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-orange"><i class="zmdi zmdi-shopping-cart"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Toplam Tahmini Sipariş</div>
+                        <div class="fc-stat-value" id="TotalForecast">-</div>
+                        <div class="fc-stat-sub">ayda ort. <span id="MonthlyAvg">-</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-purple"><i class="zmdi zmdi-time-restore"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Geçen Yıl (2025)</div>
+                        <div class="fc-stat-value">@lastYearTotal.ToString("N0", tr)</div>
+                        <div class="fc-stat-sub">tahmin farkı <span id="VsLastYear">-</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-green"><i class="zmdi zmdi-trending-up"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">Yıl İçi Değişim</div>
+                        <div class="fc-stat-value" id="YearChange">-</div>
+                        <div class="fc-stat-sub">ilk aydan son aya</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="fc-card fc-stat">
+                    <div class="fc-stat-icon i-blue"><i class="zmdi zmdi-calendar-alt"></i></div>
+                    <div style="min-width:0;">
+                        <div class="fc-stat-label">En Yoğun Ay</div>
+                        <div class="fc-stat-value" id="PeakMonth">-</div>
+                        <div class="fc-stat-sub"><span id="PeakMonthValue">-</span> sipariş</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAFİKLER -->
+        <div class="row fc-row">
+            <div class="col-lg-8">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Aylık Sipariş Tahmini</h5>
+                        <small>@selected</small>
+                    </div>
+                    <div class="chart-box"><canvas id="CategoryLineChart"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Çeyreklik Toplam</h5>
+                        <small>12 aylık tahmin</small>
+                    </div>
+                    <div class="chart-box"><canvas id="QuarterChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLO -->
+        <div class="row fc-row">
+            <div class="col-12">
+                <div class="fc-card">
+                    <div class="fc-card-head">
+                        <h5>Ay Ay Tahmin Tablosu</h5>
+                        <small>Sipariş adedi</small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="fc-table" id="CategoryTable">
+                            <thead></thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+        <script>
+            (function () {
+                // ===== Controller'dan gelen veri =====
+                const monthLabels = @Html.Raw(ViewBag.CategoryLabels);
+                const series = @Html.Raw(ViewBag.Categories);
+                const lastYearTotal = @lastYearTotal.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+                const s = series[0];
+                const values = s.values;
+
+                // ===== Yardımcılar =====
+                const num = v => Math.round(v).toLocaleString('tr-TR');
+                const sum = arr => arr.reduce((a, b) => a + b, 0);
+                const pct = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+                const color = '#7c3aed';
+
+                // ===== Hesaplamalar =====
+                const total = sum(values);
+                const peakIndex = values.indexOf(Math.max(...values));
+                const first = values[0] || 0;
+                const last = values[values.length - 1] || 0;
+                const change = first > 0 ? (last - first) * 100 / first : 0;
+                const vsLastYear = lastYearTotal > 0 ? (total - lastYearTotal) * 100 / lastYearTotal : 0;
+
+                // ===== Özet kartlar =====
+                document.getElementById('TotalForecast').textContent = num(total);
+                document.getElementById('MonthlyAvg').textContent = num(total / values.length);
+
+                const vs = document.getElementById('VsLastYear');
+                vs.textContent = pct(vsLastYear);
+                vs.style.color = vsLastYear >= 0 ? '#059669' : '#e11d48';
+
+                const yc = document.getElementById('YearChange');
+                yc.textContent = pct(change);
+                yc.style.color = change >= 0 ? '#059669' : '#e11d48';
+
+                document.getElementById('PeakMonth').textContent = monthLabels[peakIndex];
+                document.getElementById('PeakMonthValue').textContent = num(values[peakIndex]);
+
+                // ===== Chart.js ortak ayarlar =====
+                Chart.defaults.color = '#8a8f98';
+                Chart.defaults.font.family = 'inherit';
+                Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+                // ===== Çizgi grafik =====
+                new Chart(document.getElementById('CategoryLineChart'), {
+                    type: 'line',
+                    data: {
+                        labels: monthLabels,
+                        datasets: [{
+                            label: s.method,
+                            data: values,
+                            borderColor: color,
+                            backgroundColor: 'rgba(124,58,237,.10)',
+                            borderWidth: 2.5,
+                            tension: .35,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: c => num(c.raw) + ' sipariş' } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                            x: { grid: { display: false }, border: { display: false } }
+                        }
+                    }
+                });
+
+                // ===== Çeyreklik bar =====
+                const quarters = [0, 1, 2, 3].map(q => sum(values.slice(q * 3, q * 3 + 3)));
+                const quarterLabels = [0, 1, 2, 3].map(q => monthLabels[q * 3] + ' – ' + monthLabels[q * 3 + 2]);
+
+                new Chart(document.getElementById('QuarterChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: quarterLabels,
+                        datasets: [{
+                            data: quarters,
+                            backgroundColor: ['#f96332', '#3b82f6', '#10b981', '#7c3aed'],
+                            borderRadius: 8,
+                            barThickness: 22
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: c => num(c.raw) + ' sipariş (%' + (total > 0 ? (c.raw * 100 / total).toFixed(1) : 0) + ')'
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { callback: v => num(v) }, grid: { color: '#f0f1f4' }, border: { display: false } },
+                            y: { grid: { display: false }, border: { display: false }, ticks: { font: { weight: '600' } } }
+                        }
+                    }
+                });
+
+                // ===== Tablo =====
+                const table = document.getElementById('CategoryTable');
+
+                table.querySelector('thead').innerHTML =
+                    '<tr><th>Ay</th><th>Tahmini Sipariş</th><th>Önceki Aya Göre</th><th>Pay</th></tr>';
+
+                table.querySelector('tbody').innerHTML = values.map((v, i) => {
+                    const prev = i > 0 ? values[i - 1] : null;
+                    const diff = prev ? (v - prev) * 100 / prev : null;
+                    const diffHtml = diff === null
+                        ? '—'
+                        : `<span style="color:${diff >= 0 ? '#059669' : '#e11d48'};font-weight:700">${pct(diff)}</span>`;
+                    return `<tr>
+                                <td><b>${monthLabels[i]}</b></td>
+                                <td>${num(v)}</td>
+                                <td>${diffHtml}</td>
+                                <td>%${total > 0 ? (v * 100 / total).toFixed(1) : 0}</td>
+                            </tr>`;
+                }).join('');
+
+                table.querySelector('tfoot').innerHTML =
+                    `<tr><td>Toplam</td><td>${num(total)}</td><td></td><td>%100</td></tr>`;
+            })();
+        </script>
+    }
+
+</div>
